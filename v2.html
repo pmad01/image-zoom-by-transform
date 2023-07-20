@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+    body {
+      user-select: none;
+      -moz-user-select: none;
+    }
+    .zoomables {
+      border: 1px solid black;
+      width: 200px;
+      height: 200px;
+    }
+    #zoomMe {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+
+    }
+  </style>
+  <script src="zoomy.js"></script>
+
+</head>
+<body>
+<img class="zoomables" src="https://bradylab.ucsd.edu/turk/experiments/Isabella/interferenceWM/Masking/color/interferenceWMMasking_V4/cross.png" style="opacity:0.5;position:absolute;top:0;left:0;">
+<img id="zoomMe" class="zoomables" style="transform: matrix(1,0,0,1, 150, 150);" src="https://bradylab.ucsd.edu/turk/experiments/Isabella/interferenceWM/Masking/color/interferenceWMMasking_V4/cross.png">
+
+<script>
+  new Zoomy('zoomMe');
+</script>
+</body>
+</html>
