@@ -33,32 +33,53 @@
 	 * @param {HTMLElement} el
 	 * @param {Event} e
 	 */
-   function transformByMouseEvent(el, e) {
-		var r = el.getBoundingClientRect();
-		var enlargeOrShrinkBy = 0;
+	function transformByMouseEvent(el, e) {
+
+		el.oldMouseX = el.newMouseX || 0;
+		el.oldMouseY = el.newMouseY || 0;
+		el.newMouseX = e.x;
+		el.newMouseY = e.y;
+
 		var moveXBy = 0;
 		var moveYBy = 0;
+
+		el.isDragging = false;
+		if (e.type === 'mousedown') {
+			el.mouseIsDown = true;
+		}
+		if (e.type === 'mouseup') {
+			el.mouseIsDown = false;
+		}
+		if (el.mouseIsDown && e.type === 'mousemove') {
+			el.isDragging = true;
+			el.lastMousePos = true;
+		}
+		if(el.isDragging && el.lastMousePos){
+			moveXBy += el.newMouseX - el.oldMouseX;
+			moveYBy += el.newMouseY - el.oldMouseY;
+		}
+
+
+		var r = el.getBoundingClientRect();
+		var enlargeOrShrinkBy = 0;
 		var zoomFactor = .1;
 
 		if (e.deltaY) {
 			enlargeOrShrinkBy = e.deltaY > 0 ? -zoomFactor : zoomFactor;
 			var mouseX = e.x,
-				mouseY = e.y,
-				centerX = r.left + r.width / 2,
-				centerY = r.top + r.height / 2,
-				newCenterXDiff = mouseX - centerX,
-				newCenterYDiff = mouseY - centerY,
-				currentScaleX = r.width / el.width,
-				currentScaleY = r.height / el.height;
+					mouseY = e.y,
+					centerX = r.left + r.width / 2,
+					centerY = r.top + r.height / 2,
+					newCenterXDiff = mouseX - centerX,
+					newCenterYDiff = mouseY - centerY,
+					currentScaleX = r.width / el.width,
+					currentScaleY = r.height / el.height;
 			moveXBy = -(newCenterXDiff / currentScaleX * enlargeOrShrinkBy);
 			moveYBy = -(newCenterYDiff / currentScaleY * enlargeOrShrinkBy);
 		}
 		transform(el, moveXBy, moveYBy, enlargeOrShrinkBy);
 		e.preventDefault();
-   }
-
-
-   // Do not edit below!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	}
 
 	/**
 	 * This gets the transformation matrix data in real time
@@ -101,12 +122,19 @@
 	 * @return {boolean}
 	 */
 	function handleMouseEvents(e) {
-		transformByMouseEvent(window.el, e);
+		transformByMouseEvent(el, e);
 	}
 
 	var el = document.getElementById('zoomMe');
+	el.mouseIsDown = false;
+	el.lastMousePos = false;
 
-  document.addEventListener("wheel", handleMouseEvents, {passive: false});
+
+	document.addEventListener("wheel", handleMouseEvents, {passive: false});
+	document.addEventListener("mousemove", handleMouseEvents, {passive: false});
+	el.addEventListener("mousedown", handleMouseEvents);
+	document.addEventListener("mouseup", handleMouseEvents);
+	document.addEventListener("mouseout", handleMouseEvents, {passive: false});
 
 </script>
 </body>
