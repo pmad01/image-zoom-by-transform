@@ -1,19 +1,18 @@
 class Zoomy{
 	constructor(elementId) {
 		this.el = document.getElementById(elementId);
-		this.el.mouseIsDown = false;
-		this.el.lastMousePos = false;
-		this.el.isDragging = false;
-		this.el.oldMouseX = 0;
-		this.el.newMouseX = 0;
-		this.el.oldMouseY = 0;
-		this.el.newMouseY = 0;
-
-		document.addEventListener("mousemove", this.handleMouseEvents.bind(this), {passive: false});
-		this.el.addEventListener("mousedown", this.handleMouseEvents.bind(this));
-		document.addEventListener("mouseup", this.handleMouseEvents.bind(this));
-		document.addEventListener("mouseout", this.handleMouseEvents.bind(this), {passive: false});
-		document.addEventListener("wheel", this.handleMouseEvents.bind(this), {passive: false});
+		const {el} = this;
+		Object.assign(el, {
+			mouseIsDown : false,
+			lastMousePos : false,
+			isDragging : false,
+			oldMouseX : 0,
+			newMouseX : 0,
+			oldMouseY : 0,
+			newMouseY : 0
+		});
+		['mousemove', 'mouseup', 'mouseout', 'wheel'].forEach(event => document.addEventListener(event, this.handleMouseEvents.bind(this), {passive: false}));
+		el.addEventListener("mousedown", this.handleMouseEvents.bind(this), {passive: false});
 	}
 
 	/**
@@ -77,7 +76,7 @@ class Zoomy{
 	 */
 	getMatrix(el) {
 		var matrix = this.el.style.transform.substring(7);
-		matrix = matrix.slice(0, matrix.length-1).split(',').map(el=>el = parseFloat(el.trim()));
+		matrix = matrix.slice(0, matrix.length-1).split(',').map(parseFloat);
 		return {
 			scaleX: matrix[0],
 			skewY: matrix[1],
