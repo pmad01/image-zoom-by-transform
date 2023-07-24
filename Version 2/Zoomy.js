@@ -63,6 +63,12 @@ class Zoomy{
 				currentScaleY = r.height / this.el.height;
 			moveXBy = -(newCenterXDiff / currentScaleX * enlargeOrShrinkBy);
 			moveYBy = -(newCenterYDiff / currentScaleY * enlargeOrShrinkBy);
+			//Adding constraints
+			if(currentScaleX+enlargeOrShrinkBy >= 4 || currentScaleX+enlargeOrShrinkBy <= 0.5){
+				moveXBy = 0;
+				moveYBy = 0;
+				enlargeOrShrinkBy = 0;
+			}
 		}
 		this.transform(el, moveXBy, moveYBy, enlargeOrShrinkBy);
 		e.preventDefault();
