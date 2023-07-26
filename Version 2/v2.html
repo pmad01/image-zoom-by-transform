@@ -19,24 +19,53 @@
     }
     .zoomables {
       border: 1px solid black;
-      width: 200px;
-      height: 200px;
-    }
-    #zoomMe {
-      position: absolute;
-      top: 0px;
-      left: 0px;
-
+      width: 300px;
+      height: 300px;
+      overflow: hidden;
     }
   </style>
   <script src="Zoomy.js"></script>
 
 </head>
 <body>
-<img id="zoomMe" class="zoomables" style="transform: matrix(1,0,0,1, 150, 150);" src="https://bradylab.ucsd.edu/turk/experiments/Isabella/interferenceWM/Masking/color/interferenceWMMasking_V4/cross.png">
+
+<h1>Zoomy Test Page</h1>
+
+<div >
+    <img class="zoomables" id="zoomy1" src="https://bradylab.ucsd.edu/turk/experiments/Isabella/interferenceWM/Masking/color/interferenceWMMasking_V4/cross.png" alt="Image 1">
+</div>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu libero id neque tincidunt dapibus id at lacus.</p>
+
+<div >
+    <img class="zoomables" id="zoomy2" src="https://bradylab.ucsd.edu/turk/experiments/Isabella/interferenceWM/Masking/color/interferenceWMMasking_V4/cross.png" alt="Image 1">
+</div>
+
+<p>Vestibulum id orci eget tellus venenatis bibendum. In hac habitasse platea dictumst.</p>
+
+<div>
+    <img class="zoomables" id="zoomy3" src="https://bradylab.ucsd.edu/turk/experiments/Isabella/interferenceWM/Masking/color/interferenceWMMasking_V4/cross.png" alt="Image 1">
+</div>
+
+<p>Phasellus nec nunc sit amet nisi cursus luctus. Curabitur eget dui eu sapien gravida eleifend.</p>
+
+<div>
+    <img class="zoomables" id="zoomy4" src="https://bradylab.ucsd.edu/turk/experiments/Isabella/interferenceWM/Masking/color/interferenceWMMasking_V4/cross.png" alt="Image 1">
+</div>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu libero id neque tincidunt dapibus id at lacus.</p>
+
+<div>
+    <img class="zoomables" id="zoomy5" src="https://bradylab.ucsd.edu/turk/experiments/Isabella/interferenceWM/Masking/color/interferenceWMMasking_V4/cross.png" alt="Image 1">
+</div>
 
 <script>
-  new Zoomy('zoomMe');
+	const zoomy1 = new Zoomy("zoomy1");
+	const zoomy2 = new Zoomy("zoomy2");
+	const zoomy3 = new Zoomy("zoomy3");
+	const zoomy4 = new Zoomy("zoomy4");
+	const zoomy5 = new Zoomy("zoomy5");
+
 </script>
 </body>
 </html>

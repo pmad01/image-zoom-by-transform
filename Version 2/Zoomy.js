@@ -1,18 +1,18 @@
 class Zoomy{
+
+	enabled = true;
+	mouseIsDown = false;
+	lastMousePos = false;
+	isDragging = false;
+	oldMouseX = 0;
+	newMouseX = 0;
+	oldMouseY = 0;
+	newMouseY = 0;
+
 	constructor(elementId) {
 		this.el = document.getElementById(elementId);
-		Object.assign(this, {
-			enabled: true,
-			mouseIsDown : false,
-			lastMousePos : false,
-			isDragging : false,
-			oldMouseX : 0,
-			newMouseX : 0,
-			oldMouseY : 0,
-			newMouseY : 0
-		});
-		['mousemove', 'mouseup', 'mouseout', 'wheel'].forEach(event => document.addEventListener(event, this.handleMouseEvents.bind(this), {passive: false}));
-		this.el.addEventListener("mousedown", this.handleMouseEvents.bind(this), {passive: false});
+		['mousemove', 'mouseup', 'mouseout'].forEach(event => document.addEventListener(event, this.handleMouseEvents.bind(this), {passive: false}));
+		['mousedown', 'wheel'].forEach(event => this.el.addEventListener(event, this.handleMouseEvents.bind(this), {passive: false}));
 	}
 
 	/**
@@ -84,6 +84,7 @@ class Zoomy{
 	getMatrix() {
 		var matrix = this.el.style.transform.substring(7);
 		matrix = matrix.slice(0, matrix.length-1).split(',').map(parseFloat);
+		if(isNaN(matrix[0])) matrix = [1, 0, 0, 1, 0, 0];
 		return {
 			scaleX: matrix[0],
 			skewY: matrix[1],
