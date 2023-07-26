@@ -1,8 +1,8 @@
 class Zoomy{
 	constructor(elementId) {
 		this.el = document.getElementById(elementId);
-		const {el} = this;
-		Object.assign(el, {
+		Object.assign(this, {
+			enabled: true,
 			mouseIsDown : false,
 			lastMousePos : false,
 			isDragging : false,
@@ -12,7 +12,7 @@ class Zoomy{
 			newMouseY : 0
 		});
 		['mousemove', 'mouseup', 'mouseout', 'wheel'].forEach(event => document.addEventListener(event, this.handleMouseEvents.bind(this), {passive: false}));
-		el.addEventListener("mousedown", this.handleMouseEvents.bind(this), {passive: false});
+		this.el.addEventListener("mousedown", this.handleMouseEvents.bind(this), {passive: false});
 	}
 
 	/**
@@ -22,30 +22,29 @@ class Zoomy{
 	 */
 	transformByMouseEvent(el, e) {
 
-		this.el.oldMouseX = this.el.newMouseX || 0;
-		this.el.oldMouseY = this.el.newMouseY || 0;
-		this.el.newMouseX = e.x;
-		this.el.newMouseY = e.y;
+		this.oldMouseX = this.newMouseX || 0;
+		this.oldMouseY = this.newMouseY || 0;
+		this.newMouseX = e.x;
+		this.newMouseY = e.y;
 
 		var moveXBy = 0;
 		var moveYBy = 0;
 
-		this.el.isDragging = false;
+		this.isDragging = false;
 		if (e.type === 'mousedown') {
-			this.el.mouseIsDown = true;
+			this.mouseIsDown = true;
 		}
 		if (e.type === 'mouseup') {
-			this.el.mouseIsDown = false;
+			this.mouseIsDown = false;
 		}
-		if (this.el.mouseIsDown && e.type === 'mousemove') {
-			this.el.isDragging = true;
-			this.el.lastMousePos = true;
+		if (this.mouseIsDown && e.type === 'mousemove') {
+			this.isDragging = true;
+			this.lastMousePos = true;
 		}
-		if(this.el.isDragging && this.el.lastMousePos){
-			moveXBy += this.el.newMouseX - this.el.oldMouseX;
-			moveYBy += this.el.newMouseY - this.el.oldMouseY;
+		if(this.isDragging && this.lastMousePos){
+			moveXBy += this.newMouseX - this.oldMouseX;
+			moveYBy += this.newMouseY - this.oldMouseY;
 		}
-
 
 		var r = this.el.getBoundingClientRect();
 		var enlargeOrShrinkBy = 0;
@@ -64,23 +63,25 @@ class Zoomy{
 			moveXBy = -(newCenterXDiff / currentScaleX * enlargeOrShrinkBy);
 			moveYBy = -(newCenterYDiff / currentScaleY * enlargeOrShrinkBy);
 			//Adding constraints
-			if(currentScaleX+enlargeOrShrinkBy >= 4 || currentScaleX+enlargeOrShrinkBy <= 0.5){
+			if(currentScaleX + enlargeOrShrinkBy >= 5 || currentScaleX + enlargeOrShrinkBy <= 0.5){
 				moveXBy = 0;
 				moveYBy = 0;
 				enlargeOrShrinkBy = 0;
 			}
+			if(!this.isInViewport() && !this.el.contains(e.target)){
+				moveXBy = 0;
+				moveYBy = 0;
+			}
 		}
 		this.transform(el, moveXBy, moveYBy, enlargeOrShrinkBy);
 		e.preventDefault();
-
 	}
 
 	/**
 	 * This gets the transformation matrix data in real time
-	 * @param {HTMLElement} el
 	 * @return {{scaleX: number, scaleY: number, translateY: number, translateX: number, skewX: number, skewY: number}}
 	 */
-	getMatrix(el) {
+	getMatrix() {
 		var matrix = this.el.style.transform.substring(7);
 		matrix = matrix.slice(0, matrix.length-1).split(',').map(parseFloat);
 		return {
@@ -102,7 +103,7 @@ class Zoomy{
 	 * @return void
 	 */
 	transform(el, moveXBy = 0, moveYBy = 0, enlargeOrShrinkBy = 0) {
-		var m = this.getMatrix(el);
+		var m = this.getMatrix();
 		m.translateX += moveXBy;
 		m.translateY += moveYBy;
 		m.scaleX += enlargeOrShrinkBy;
@@ -111,11 +112,51 @@ class Zoomy{
 	}
 
 	/**
+	 * This method checks if the element is outside the viewport.
+	 * @return {boolean}
+	 */
+	isInViewport() {
+		const r = this.el.getBoundingClientRect();
+		return (
+			r.top >= 0 &&
+			r.left >= 0 &&
+			r.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+			r.right <= (window.innerWidth || document.documentElement.clientWidth)
+		);
+	}
+
+
+	/**
+	 * This method removes the event listeners from the instance element of the class.
+	 */
+	detach(){
+		['mousemove', 'mouseup', 'mouseout', 'wheel'].forEach(event => document.removeEventListener(event, this.handleMouseEvents));
+		this.el.removeEventListener("mousedown", this.handleMouseEvents);
+	}
+
+	/**
+	 * This method enables the instance of the class
+	 */
+	enable(){
+		this.enabled = true;
+	}
+
+	/**
+	 * This method disables the instance of the class
+	 */
+	disable(){
+		this.enabled  = false;
+	}
+
+	/**
 	 * Handles all mouse events
 	 * @param {MouseEvent} e
 	 * @return {boolean}
 	 */
 	handleMouseEvents(e) {
+		if(!this.enabled){
+			return;
+		}
 		this.transformByMouseEvent(window.el, e);
 	}
 
