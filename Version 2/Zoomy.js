@@ -1,16 +1,17 @@
 class Zoomy{
+
+	//document these
+	enabled: true,
+	mouseIsDown : false,
+	lastMousePos : false,
+	isDragging : false,
+	oldMouseX : 0,
+	newMouseX : 0,
+	oldMouseY : 0,
+	newMouseY : 0
+	
 	constructor(elementId) {
 		this.el = document.getElementById(elementId);
-		Object.assign(this, {
-			enabled: true,
-			mouseIsDown : false,
-			lastMousePos : false,
-			isDragging : false,
-			oldMouseX : 0,
-			newMouseX : 0,
-			oldMouseY : 0,
-			newMouseY : 0
-		});
 		['mousemove', 'mouseup', 'mouseout', 'wheel'].forEach(event => document.addEventListener(event, this.handleMouseEvents.bind(this), {passive: false}));
 		this.el.addEventListener("mousedown", this.handleMouseEvents.bind(this), {passive: false});
 	}
