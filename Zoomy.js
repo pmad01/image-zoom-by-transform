@@ -1,26 +1,97 @@
 class Zoomy{
 
+	/**
+	 *The HTML element we want to transform
+	 * @type {HTMLElement}
+	 */
+	el;
+
+	/**
+	 *The optional HTML element surrounding el
+	 * @type {HTMLElement}
+	 */
+	boundaryEl;
+
+	/**
+	 * Checks if the element is enabled or not
+	 * @type {boolean}
+	 */
 	enabled = true;
+
+	/**
+	 * Checks if mouse is clicked
+	 * @type {boolean}
+	 */
 	mouseIsDown = false;
-	lastMousePos = false;
+
+	/**
+	 * Checks if we are moving the image
+	 * @type {boolean}
+	 */
 	isDragging = false;
+
+	/**
+	 * The X coordinate of the cursor after the previous transformation
+	 * @type {number}
+	 */
 	oldMouseX = 0;
+
+	/**
+	 * The X coordinate of the cursor in real time
+	 * @type {number}
+	 */
 	newMouseX = 0;
+
+	/**
+	 * The Y coordinate of the cursor after the previous transformation
+	 * @type {number}
+	 */
 	oldMouseY = 0;
+
+	/**
+	 * The Y coordinate of the cursor in real time
+	 * @type {number}
+	 */
 	newMouseY = 0;
 
-	constructor(elementId) {
+	options = {
+		boundaryElementId: null,
+		zoomUpperConstraint: null
+	};
+
+	/**
+	 *
+	 * @param elementId
+	 * @param {object} options
+	 */
+	constructor(elementId, options) {
+		this.options = options;
 		this.el = document.getElementById(elementId);
-		['mousemove', 'mouseup', 'mouseout'].forEach(event => document.addEventListener(event, this.handleMouseEvents.bind(this), {passive: false}));
-		['mousedown', 'wheel'].forEach(event => this.el.addEventListener(event, this.handleMouseEvents.bind(this), {passive: false}));
+		var bElId = this.options.boundaryElementId;
+		this.boundaryEl = document.getElementById(bElId);
+		this.zoomUpperConstraint = this.options.zoomUpperConstraint;
+		var fn = this.handleMouseEvents.bind(this);
+		if (this.boundaryEl) {
+			this.boundaryRect = this.boundaryEl.getBoundingClientRect();
+			this.boundaryEl.addEventListener('wheel', fn, {passive: false});
+		} else {
+			this.el.addEventListener('wheel', fn, {passive: false});
+		}
+
+		this.el.addEventListener('mousedown', fn, {passive: false});
+
+		['mousemove', 'mouseup', 'mouseout'].forEach(
+			event => {
+				document.addEventListener(event, fn, {passive: false});
+			}
+		);
 	}
 
 	/**
 	 * 'Resize and move image' (output) on screen based on 'mouse action' (input)
-	 * @param {HTMLElement} el
 	 * @param {Event} e
 	 */
-	transformByMouseEvent(el, e) {
+	transformByMouseEvent(e) {
 
 		this.oldMouseX = this.newMouseX || 0;
 		this.oldMouseY = this.newMouseY || 0;
@@ -39,9 +110,8 @@ class Zoomy{
 		}
 		if (this.mouseIsDown && e.type === 'mousemove') {
 			this.isDragging = true;
-			this.lastMousePos = true;
 		}
-		if(this.isDragging && this.lastMousePos){
+		if (this.isDragging) {
 			moveXBy += this.newMouseX - this.oldMouseX;
 			moveYBy += this.newMouseY - this.oldMouseY;
 		}
@@ -62,18 +132,22 @@ class Zoomy{
 				currentScaleY = r.height / this.el.height;
 			moveXBy = -(newCenterXDiff / currentScaleX * enlargeOrShrinkBy);
 			moveYBy = -(newCenterYDiff / currentScaleY * enlargeOrShrinkBy);
-			//Adding constraints
-			if(currentScaleX + enlargeOrShrinkBy >= 5 || currentScaleX + enlargeOrShrinkBy <= 0.5){
+			//Adding upper constraint
+			if (currentScaleX + enlargeOrShrinkBy >= this.zoomUpperConstraint
+				|| currentScaleX + enlargeOrShrinkBy <= 1) {
 				moveXBy = 0;
 				moveYBy = 0;
 				enlargeOrShrinkBy = 0;
 			}
-			if(!this.isInViewport() && !this.el.contains(e.target)){
-				moveXBy = 0;
-				moveYBy = 0;
+			if (this.boundaryEl) {
+				if (!this.isInBoundary(r) && !this.el.contains(e.target)) {
+					moveXBy = 0;
+					moveYBy = 0;
+				}
 			}
 		}
-		this.transform(el, moveXBy, moveYBy, enlargeOrShrinkBy);
+
+		this.transform(this.el, moveXBy, moveYBy, enlargeOrShrinkBy);
 		e.preventDefault();
 	}
 
@@ -82,9 +156,12 @@ class Zoomy{
 	 * @return {{scaleX: number, scaleY: number, translateY: number, translateX: number, skewX: number, skewY: number}}
 	 */
 	getMatrix() {
-		var matrix = this.el.style.transform.substring(7);
-		matrix = matrix.slice(0, matrix.length-1).split(',').map(parseFloat);
-		if(isNaN(matrix[0])) matrix = [1, 0, 0, 1, 0, 0];
+		var matrix = this.el.style.transform?.substring(7);
+		if (matrix) {
+			matrix = matrix.slice(0, matrix.length - 1).split(',').map(parseFloat);
+		} else {
+			matrix = [1, 0, 0, 1, 0, 0];
+		}
 		return {
 			scaleX: matrix[0],
 			skewY: matrix[1],
@@ -113,26 +190,33 @@ class Zoomy{
 	}
 
 	/**
-	 * This method checks if the element is outside the viewport.
+	 * This method checks if the element is inside the boundary element
+	 * @param {DOMRect} r
 	 * @return {boolean}
 	 */
-	isInViewport() {
-		const r = this.el.getBoundingClientRect();
+	isInBoundary(r) {
 		return (
-			r.top >= 0 &&
-			r.left >= 0 &&
-			r.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-			r.right <= (window.innerWidth || document.documentElement.clientWidth)
+			r.top >= this.boundaryRect.top &&
+			r.left >= this.boundaryRect.left &&
+			r.bottom <= this.boundaryRect.bottom &&
+			r.right <= this.boundaryRect.right
 		);
 	}
-
 
 	/**
 	 * This method removes the event listeners from the instance element of the class.
 	 */
 	detach(){
-		['mousemove', 'mouseup', 'mouseout', 'wheel'].forEach(event => document.removeEventListener(event, this.handleMouseEvents));
-		this.el.removeEventListener("mousedown", this.handleMouseEvents);
+		if (this.boundaryEl) {
+			this.boundaryEl.removeEventListener('wheel', this.handleMouseEvents);
+		} else {
+			this.el.removeEventListener('wheel', this.handleMouseEvents);
+		}
+		this.el.removeEventListener('mousedown', this.handleMouseEvents);
+
+		['mousemove', 'mouseup', 'mouseout'].forEach(
+			event => document.removeEventListener(event, this.handleMouseEvents)
+		);
 	}
 
 	/**
@@ -156,9 +240,9 @@ class Zoomy{
 	 */
 	handleMouseEvents(e) {
 		if(!this.enabled){
-			return;
+			return false;
 		}
-		this.transformByMouseEvent(window.el, e);
+		this.transformByMouseEvent(e);
 	}
 
 }

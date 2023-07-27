@@ -31,40 +31,57 @@
 
 <h1>Zoomy Test Page</h1>
 
-<div >
-    <img class="zoomables" id="zoomy1" src="https://bradylab.ucsd.edu/turk/experiments/Isabella/interferenceWM/Masking/color/interferenceWMMasking_V4/cross.png" alt="Image 1">
+
+<div id="myBoundaryElement" style="width: 400px; height:700px; border:1px solid red; overflow: hidden;">
+    <div style="width:350px; height:600px; border: 1px solid blue">
+        <img class="zoomables" id="zoomy1" src="https://bradylab.ucsd.edu/turk/experiments/Isabella/interferenceWM/Masking/color/interferenceWMMasking_V4/cross.png" alt="Image 1">
+    </div>
 </div>
+<button onclick="zoomy1.enable()">Enable</button>
+<button onclick="zoomy1.disable()">Disable</button>
 
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu libero id neque tincidunt dapibus id at lacus.</p>
 
 <div >
     <img class="zoomables" id="zoomy2" src="https://bradylab.ucsd.edu/turk/experiments/Isabella/interferenceWM/Masking/color/interferenceWMMasking_V4/cross.png" alt="Image 1">
+    <button onclick="zoomy2.enable()">Enable</button>
+    <button onclick="zoomy2.disable()">Disable</button>
 </div>
 
 <p>Vestibulum id orci eget tellus venenatis bibendum. In hac habitasse platea dictumst.</p>
 
 <div>
     <img class="zoomables" id="zoomy3" src="https://bradylab.ucsd.edu/turk/experiments/Isabella/interferenceWM/Masking/color/interferenceWMMasking_V4/cross.png" alt="Image 1">
+    <button onclick="zoomy3.enable()">Enable</button>
+    <button onclick="zoomy3.disable()">Disable</button>
 </div>
 
 <p>Phasellus nec nunc sit amet nisi cursus luctus. Curabitur eget dui eu sapien gravida eleifend.</p>
 
 <div>
     <img class="zoomables" id="zoomy4" src="https://bradylab.ucsd.edu/turk/experiments/Isabella/interferenceWM/Masking/color/interferenceWMMasking_V4/cross.png" alt="Image 1">
+    <button onclick="zoomy4.enable()">Enable</button>
+    <button onclick="zoomy4.disable()">Disable</button>
 </div>
 
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu libero id neque tincidunt dapibus id at lacus.</p>
 
 <div>
     <img class="zoomables" id="zoomy5" src="https://bradylab.ucsd.edu/turk/experiments/Isabella/interferenceWM/Masking/color/interferenceWMMasking_V4/cross.png" alt="Image 1">
+    <button onclick="zoomy5.enable()">Enable</button>
+    <button onclick="zoomy5.disable()">Disable</button>
 </div>
 
 <script>
-	const zoomy1 = new Zoomy("zoomy1");
-	const zoomy2 = new Zoomy("zoomy2");
-	const zoomy3 = new Zoomy("zoomy3");
-	const zoomy4 = new Zoomy("zoomy4");
-	const zoomy5 = new Zoomy("zoomy5");
+	const zoomy1 = new Zoomy("zoomy1", {boundaryElementId: 'myBoundaryElement'});
+
+	const zoomy2 = new Zoomy("zoomy2", {boundaryElementId: null, zoomUpperConstraint: 5});
+
+	const zoomy3 = new Zoomy("zoomy3", {boundaryElementId: null});
+
+	const zoomy4 = new Zoomy("zoomy4", {boundaryElementId: null});
+
+	const zoomy5 = new Zoomy("zoomy5", {boundaryElementId: null});
 
 </script>
 </body>
