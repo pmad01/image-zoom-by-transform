@@ -69,7 +69,7 @@ class Zoomy{
 		this.el = document.getElementById(elementId);
 		var bElId = this.options.boundaryElementId;
 		this.boundaryEl = document.getElementById(bElId);
-		this.zoomUpperConstraint = this.options.zoomUpperConstraint;
+		this.options.zoomUpperConstraint ||= 4;
 		var fn = this.handleMouseEvents.bind(this);
 		if (this.boundaryEl) {
 			this.boundaryRect = this.boundaryEl.getBoundingClientRect();
@@ -130,20 +130,40 @@ class Zoomy{
 				newCenterYDiff = mouseY - centerY,
 				currentScaleX = r.width / this.el.width,
 				currentScaleY = r.height / this.el.height;
+
 			moveXBy = -(newCenterXDiff / currentScaleX * enlargeOrShrinkBy);
 			moveYBy = -(newCenterYDiff / currentScaleY * enlargeOrShrinkBy);
+
+			if (this.boundaryEl) {
+				if (!this.el.contains(e.target)) {
+					var widthAfterZoom = this.el.width * (currentScaleX  + enlargeOrShrinkBy);
+					var heightAfterZoom = this.el.height * (currentScaleY + enlargeOrShrinkBy);
+
+					var widthDiff = widthAfterZoom - this.el.width;
+					var previousWidthDiff = r.width - this.el.width;
+					var heightDiff = heightAfterZoom - this.el.height;
+					var previousHeightDiff = r.height - this.el.height;
+
+					if (r.left <= this.boundaryRect.left + 1) {
+						moveXBy = widthDiff / 2 - previousWidthDiff / 2;
+					}
+					if (r.top <= this.boundaryRect.top + 1) {
+						moveYBy = heightDiff / 2 - previousHeightDiff/2;
+					}
+					if (r.right >= this.boundaryRect.right) {
+						moveXBy = 0;
+					}
+					if (r.right >= this.boundaryRect.right) {
+						moveYBy = 0;
+					}
+				}
+			}
 			//Adding upper constraint
-			if (currentScaleX + enlargeOrShrinkBy >= this.zoomUpperConstraint
+			if (currentScaleX + enlargeOrShrinkBy >= this.options.zoomUpperConstraint
 				|| currentScaleX + enlargeOrShrinkBy <= 1) {
 				moveXBy = 0;
 				moveYBy = 0;
 				enlargeOrShrinkBy = 0;
-			}
-			if (this.boundaryEl) {
-				if (!this.isInBoundary(r) && !this.el.contains(e.target)) {
-					moveXBy = 0;
-					moveYBy = 0;
-				}
 			}
 		}
 
