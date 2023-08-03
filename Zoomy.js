@@ -1,4 +1,4 @@
-class Zoomy{
+class Zoomy {
 
 	/**
 	 *The HTML element we want to transform
@@ -69,6 +69,10 @@ class Zoomy{
 		this.el = document.getElementById(elementId);
 		var bElId = this.options.boundaryElementId;
 		this.boundaryEl = document.getElementById(bElId);
+		this.previousImagePos = {
+			previousX: [],
+			previousY: []
+		};
 		this.options.zoomUpperConstraint ||= 4;
 		var fn = this.handleMouseEvents.bind(this);
 		if (this.boundaryEl) {
@@ -116,56 +120,62 @@ class Zoomy{
 			moveYBy += this.newMouseY - this.oldMouseY;
 		}
 
+
 		var r = this.el.getBoundingClientRect();
 		var enlargeOrShrinkBy = 0;
 		var zoomFactor = .1;
 
 		if (e.deltaY) {
-			enlargeOrShrinkBy = e.deltaY > 0 ? -zoomFactor : zoomFactor;
 			var mouseX = e.x,
 				mouseY = e.y,
 				centerX = r.left + r.width / 2,
 				centerY = r.top + r.height / 2,
 				newCenterXDiff = mouseX - centerX,
 				newCenterYDiff = mouseY - centerY,
-				currentScaleX = r.width / this.el.width,
-				currentScaleY = r.height / this.el.height;
+				currentScaleX = Math.round((r.width / this.el.width) * 100) / 100,
+				currentScaleY = Math.round((r.height / this.el.height) * 100) / 100;
+			    enlargeOrShrinkBy = Math.round(((e.deltaY > 0 ? -zoomFactor : zoomFactor) * currentScaleX) * 100) / 100;
 
-			moveXBy = -(newCenterXDiff / currentScaleX * enlargeOrShrinkBy);
-			moveYBy = -(newCenterYDiff / currentScaleY * enlargeOrShrinkBy);
-
-			if (this.boundaryEl) {
-				if (!this.el.contains(e.target)) {
-					var widthAfterZoom = this.el.width * (currentScaleX  + enlargeOrShrinkBy);
-					var heightAfterZoom = this.el.height * (currentScaleY + enlargeOrShrinkBy);
-
-					var widthDiff = widthAfterZoom - this.el.width;
-					var previousWidthDiff = r.width - this.el.width;
-					var heightDiff = heightAfterZoom - this.el.height;
-					var previousHeightDiff = r.height - this.el.height;
-
-					if (r.left <= this.boundaryRect.left + 1) {
-						moveXBy = widthDiff / 2 - previousWidthDiff / 2;
-					}
-					if (r.top <= this.boundaryRect.top + 1) {
-						moveYBy = heightDiff / 2 - previousHeightDiff/2;
-					}
-					if (r.right >= this.boundaryRect.right) {
-						moveXBy = 0;
-					}
-					if (r.right >= this.boundaryRect.right) {
-						moveYBy = 0;
-					}
-				}
-			}
-			//Adding upper constraint
+			// Adding upper constraint
 			if (currentScaleX + enlargeOrShrinkBy >= this.options.zoomUpperConstraint
 				|| currentScaleX + enlargeOrShrinkBy <= 1) {
 				moveXBy = 0;
 				moveYBy = 0;
 				enlargeOrShrinkBy = 0;
 			}
+
+			if (this.boundaryEl) {
+				if (!this.el.contains(e.target)) {
+					if (e.deltaY > 0) {
+
+						//0. how to start
+							// what needs to be done?
+								// move square
+									//where?
+										//pixels, top and left
+											//which are?
+
+						var endPositionOfImageFromLeft = this.boundaryEl.offsetWidth / 2 ;
+						var endPositionOfImageFromTop = this.boundaryEl.offsetHeight / 2;
+
+
+						var currentXDistance = Math.round((endPositionOfImageFromLeft - ((r.left - this.boundaryRect.left) + r.width / 2)) * 100) / 100;
+						var currentYDistance = Math.round((endPositionOfImageFromTop - ((r.top - this.boundaryRect.top) + r.height / 2)) * 100) / 100 ;
+
+						moveXBy = -(currentXDistance / (currentScaleX - 1) * enlargeOrShrinkBy);
+						moveYBy = -(currentYDistance / (currentScaleY - 1) * enlargeOrShrinkBy);
+
+
+					}
+
+				} else {
+					moveXBy = -(newCenterXDiff / currentScaleX * enlargeOrShrinkBy);
+					moveYBy = -(newCenterYDiff / currentScaleY * enlargeOrShrinkBy);
+				}
+			}
+
 		}
+
 
 		this.transform(this.el, moveXBy, moveYBy, enlargeOrShrinkBy);
 		e.preventDefault();
