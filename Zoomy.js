@@ -158,9 +158,12 @@ class Zoomy {
 						var endPositionOfImageFromLeft = this.boundaryEl.offsetWidth / 2 ;
 						var endPositionOfImageFromTop = this.boundaryEl.offsetHeight / 2;
 
+						var imageXCoordinate = (r.left - this.boundaryRect.left) + r.width / 2;
+						var imageYCoordinate = (r.top - this.boundaryRect.top) + r.height / 2;
 
-						var currentXDistance = Math.round((endPositionOfImageFromLeft - ((r.left - this.boundaryRect.left) + r.width / 2)) * 100) / 100;
-						var currentYDistance = Math.round((endPositionOfImageFromTop - ((r.top - this.boundaryRect.top) + r.height / 2)) * 100) / 100 ;
+
+						var currentXDistance = Math.round((endPositionOfImageFromLeft - imageXCoordinate * 100) / 100);
+						var currentYDistance = Math.round((endPositionOfImageFromTop - imageYCoordinate  * 100) / 100 );
 
 						moveXBy = -(currentXDistance / (currentScaleX - 1) * enlargeOrShrinkBy);
 						moveYBy = -(currentYDistance / (currentScaleY - 1) * enlargeOrShrinkBy);
