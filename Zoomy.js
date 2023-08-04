@@ -7,12 +7,6 @@ class Zoomy {
 	el;
 
 	/**
-	 *The optional HTML element surrounding el
-	 * @type {HTMLElement}
-	 */
-	boundaryEl;
-
-	/**
 	 * Checks if the element is enabled or not
 	 * @type {boolean}
 	 */
@@ -53,10 +47,9 @@ class Zoomy {
 	 * @param {object} options
 	 */
 	constructor(elementId, options) {
-		this.options = options;
 		this.el = document.getElementById(elementId);
-		var bElId = this.options.boundaryElementId;
-		this.boundaryEl = document.getElementById(bElId);
+		this.options = { ...options };
+		this.boundaryEl = this.options.boundaryElementId ? document.getElementById(this.options.boundaryElementId) : null;
 		this.options.zoomUpperConstraint ||= 4;
 		var fn = this.handleMouseEvents.bind(this);
 		if (this.boundaryEl) {
@@ -163,6 +156,9 @@ class Zoomy {
 					moveXBy = -(newCenterXDiff / currentScaleX * enlargeOrShrinkBy);
 					moveYBy = -(newCenterYDiff / currentScaleY * enlargeOrShrinkBy);
 				}
+			} else {
+				moveXBy = -(newCenterXDiff / currentScaleX * enlargeOrShrinkBy);
+				moveYBy = -(newCenterYDiff / currentScaleY * enlargeOrShrinkBy);
 			}
 
 		}
@@ -262,6 +258,7 @@ class Zoomy {
 		if(!this.enabled){
 			return false;
 		}
+
 		this.transformByMouseEvent(e);
 	}
 
