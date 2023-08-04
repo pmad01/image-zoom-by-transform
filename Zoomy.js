@@ -54,6 +54,12 @@ class Zoomy {
 	 */
 	newMouseY = 0;
 
+	/**
+	 * Counts the available scrolls, +1 for each zoom in, -1 for each zoom out
+	 * @type {number}
+	 */
+	scrollCounter = 0;
+
 	options = {
 		boundaryElementId: null,
 		zoomUpperConstraint: null
@@ -148,30 +154,37 @@ class Zoomy {
 				if (!this.el.contains(e.target)) {
 					if (e.deltaY > 0) {
 
-						//0. how to start
-							// what needs to be done?
-								// move square
-									//where?
-										//pixels, top and left
-											//which are?
-
 						var endPositionOfImageFromLeft = this.boundaryEl.offsetWidth / 2 ;
 						var endPositionOfImageFromTop = this.boundaryEl.offsetHeight / 2;
 
 						var imageXCoordinate = (r.left - this.boundaryRect.left) + r.width / 2;
 						var imageYCoordinate = (r.top - this.boundaryRect.top) + r.height / 2;
+						console.log(imageXCoordinate)
 
 
 						var currentXDistance = Math.round(((endPositionOfImageFromLeft - imageXCoordinate) * 100) / 100);
 						var currentYDistance = Math.round(((endPositionOfImageFromTop - imageYCoordinate)  * 100) / 100 );
 
-						moveXBy = -(currentXDistance / (currentScaleX - 1) * enlargeOrShrinkBy);
-						moveYBy = -(currentYDistance / (currentScaleY - 1) * enlargeOrShrinkBy);
+						if (this.scrollCounter <= 2) {
+							var matrix = this.getMatrix();
+							moveXBy = -matrix.translateX;
+							moveYBy = -matrix.translateY;
+							enlargeOrShrinkBy = -(matrix.scaleX-1);
 
+						} else {
+							moveXBy = -(currentXDistance / (currentScaleX - 1) * enlargeOrShrinkBy);
+							moveYBy = -(currentYDistance / (currentScaleY - 1) * enlargeOrShrinkBy);
+						}
 
+						this.scrollCounter--;
+
+					} else {
+						this.scrollCounter++;
 					}
 
 				} else {
+
+					e.deltaY > 0 ? this.scrollCounter-- : this.scrollCounter++;
 					moveXBy = -(newCenterXDiff / currentScaleX * enlargeOrShrinkBy);
 					moveYBy = -(newCenterYDiff / currentScaleY * enlargeOrShrinkBy);
 				}
