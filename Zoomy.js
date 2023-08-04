@@ -34,31 +34,13 @@ class Zoomy {
 	 * The X coordinate of the cursor after the previous transformation
 	 * @type {number}
 	 */
-	oldMouseX = 0;
-
-	/**
-	 * The X coordinate of the cursor in real time
-	 * @type {number}
-	 */
-	newMouseX = 0;
+	lastMouseX = 0;
 
 	/**
 	 * The Y coordinate of the cursor after the previous transformation
 	 * @type {number}
 	 */
-	oldMouseY = 0;
-
-	/**
-	 * The Y coordinate of the cursor in real time
-	 * @type {number}
-	 */
-	newMouseY = 0;
-
-	/**
-	 * Counts the available scrolls, +1 for each zoom in, -1 for each zoom out
-	 * @type {number}
-	 */
-	scrollCounter = 0;
+	lastMouseY = 0;
 
 	options = {
 		boundaryElementId: null,
@@ -75,14 +57,9 @@ class Zoomy {
 		this.el = document.getElementById(elementId);
 		var bElId = this.options.boundaryElementId;
 		this.boundaryEl = document.getElementById(bElId);
-		this.previousImagePos = {
-			previousX: [],
-			previousY: []
-		};
 		this.options.zoomUpperConstraint ||= 4;
 		var fn = this.handleMouseEvents.bind(this);
 		if (this.boundaryEl) {
-			this.boundaryRect = this.boundaryEl.getBoundingClientRect();
 			this.boundaryEl.addEventListener('wheel', fn, {passive: false});
 		} else {
 			this.el.addEventListener('wheel', fn, {passive: false});
@@ -103,10 +80,8 @@ class Zoomy {
 	 */
 	transformByMouseEvent(e) {
 
-		this.oldMouseX = this.newMouseX || 0;
-		this.oldMouseY = this.newMouseY || 0;
-		this.newMouseX = e.x;
-		this.newMouseY = e.y;
+		const currentMouseX = e.x;
+		const currentMouseY = e.y;
 
 		var moveXBy = 0;
 		var moveYBy = 0;
@@ -122,9 +97,11 @@ class Zoomy {
 			this.isDragging = true;
 		}
 		if (this.isDragging) {
-			moveXBy += this.newMouseX - this.oldMouseX;
-			moveYBy += this.newMouseY - this.oldMouseY;
+			moveXBy += currentMouseX - this.lastMouseX;
+			moveYBy += currentMouseY - this.lastMouseY;
 		}
+		this.lastMouseX = currentMouseX;
+		this.lastMouseY = currentMouseY;
 
 
 		var r = this.el.getBoundingClientRect();
@@ -132,6 +109,9 @@ class Zoomy {
 		var zoomFactor = .1;
 
 		if (e.deltaY) {
+			if (this.scrollCounter < 0) {
+				this.scrollCounter = 0;
+			}
 			var mouseX = e.x,
 				mouseY = e.y,
 				centerX = r.left + r.width / 2,
@@ -153,45 +133,39 @@ class Zoomy {
 			if (this.boundaryEl) {
 				if (!this.el.contains(e.target)) {
 					if (e.deltaY > 0) {
-
 						var endPositionOfImageFromLeft = this.boundaryEl.offsetWidth / 2 ;
 						var endPositionOfImageFromTop = this.boundaryEl.offsetHeight / 2;
 
-						var imageXCoordinate = (r.left - this.boundaryRect.left) + r.width / 2;
-						var imageYCoordinate = (r.top - this.boundaryRect.top) + r.height / 2;
-						console.log(imageXCoordinate)
+						var imageXCoordinate = (r.left - this.boundaryEl.offsetLeft) + r.width / 2;
+						var imageYCoordinate = (r.top - this.boundaryEl.offsetTop) + r.height / 2;
 
+						var currentXDistanceImageToCenter = Math.round(((endPositionOfImageFromLeft - imageXCoordinate) * 100) / 100);
+						var currentYDistanceImageToCenter = Math.round(((endPositionOfImageFromTop - imageYCoordinate)  * 100) / 100 );
 
-						var currentXDistance = Math.round(((endPositionOfImageFromLeft - imageXCoordinate) * 100) / 100);
-						var currentYDistance = Math.round(((endPositionOfImageFromTop - imageYCoordinate)  * 100) / 100 );
-
-						if (this.scrollCounter < 2) {
+						if ((currentScaleX*enlargeOrShrinkBy) / (1 + enlargeOrShrinkBy) === 0) {
 							var matrix = this.getMatrix();
-							moveXBy = -matrix.translateX;
-							moveYBy = -matrix.translateY;
-							enlargeOrShrinkBy = -(matrix.scaleX-1);
-
+							if (matrix.scaleX === 1) {
+								moveXBy = 0;
+								moveYBy = 0;
+							} else {
+								moveXBy = -matrix.translateX;
+								moveYBy = -matrix.translateY;
+								enlargeOrShrinkBy = -(matrix.scaleX-1);
+							}
 						} else {
-							moveXBy = -(currentXDistance / (currentScaleX - 1) * enlargeOrShrinkBy);
-							moveYBy = -(currentYDistance / (currentScaleY - 1) * enlargeOrShrinkBy);
+							moveXBy = -(currentXDistanceImageToCenter / (currentScaleX - 1) * enlargeOrShrinkBy);
+							moveYBy = -(currentYDistanceImageToCenter / (currentScaleY - 1) * enlargeOrShrinkBy);
 						}
 
-						this.scrollCounter--;
-
-					} else {
-						this.scrollCounter++;
 					}
 
 				} else {
-
-					e.deltaY > 0 ? this.scrollCounter-- : this.scrollCounter++;
 					moveXBy = -(newCenterXDiff / currentScaleX * enlargeOrShrinkBy);
 					moveYBy = -(newCenterYDiff / currentScaleY * enlargeOrShrinkBy);
 				}
 			}
 
 		}
-
 
 		this.transform(this.el, moveXBy, moveYBy, enlargeOrShrinkBy);
 		e.preventDefault();
@@ -242,10 +216,10 @@ class Zoomy {
 	 */
 	isInBoundary(r) {
 		return (
-			r.top >= this.boundaryRect.top &&
-			r.left >= this.boundaryRect.left &&
-			r.bottom <= this.boundaryRect.bottom &&
-			r.right <= this.boundaryRect.right
+			r.top >= this.boundaryEl.offsetTop &&
+			r.left >= this.boundaryEl.offsetLeft &&
+			r.bottom <= window.innerHeight - (this.boundaryEl.offsetTop + this.boundaryEl.offsetHeight) &&
+			r.right <= window.innerWidth - (this.boundaryEl.offsetLeft + this.boundaryEl.offsetWidth)
 		);
 	}
 
