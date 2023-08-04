@@ -165,7 +165,7 @@ class Zoomy {
 						var currentXDistance = Math.round(((endPositionOfImageFromLeft - imageXCoordinate) * 100) / 100);
 						var currentYDistance = Math.round(((endPositionOfImageFromTop - imageYCoordinate)  * 100) / 100 );
 
-						if (this.scrollCounter <= 2) {
+						if (this.scrollCounter < 2) {
 							var matrix = this.getMatrix();
 							moveXBy = -matrix.translateX;
 							moveYBy = -matrix.translateY;
