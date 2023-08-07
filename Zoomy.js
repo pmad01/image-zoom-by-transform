@@ -102,9 +102,6 @@ class Zoomy {
 		var zoomFactor = .1;
 
 		if (e.deltaY) {
-			if (this.scrollCounter < 0) {
-				this.scrollCounter = 0;
-			}
 			var mouseX = e.x,
 				mouseY = e.y,
 				centerX = r.left + r.width / 2,
@@ -126,17 +123,18 @@ class Zoomy {
 			if (this.boundaryEl) {
 				if (!this.el.contains(e.target)) {
 					if (e.deltaY > 0) {
-						var endPositionOfImageFromLeft = this.boundaryEl.offsetWidth / 2 ;
+						var matrix = this.getMatrix();
+
+						var endPositionOfImageFromLeft = this.boundaryEl.offsetWidth / 2;
 						var endPositionOfImageFromTop = this.boundaryEl.offsetHeight / 2;
 
-						var imageXCoordinate = (r.left - this.boundaryEl.offsetLeft) + r.width / 2;
-						var imageYCoordinate = (r.top - this.boundaryEl.offsetTop) + r.height / 2;
+						var imageXCoordinate = (this.el.offsetLeft + matrix.translateX - this.boundaryEl.offsetLeft) + this.el.width / 2;
+						var imageYCoordinate = (this.el.offsetTop + matrix.translateY - this.boundaryEl.offsetTop) + this.el.height / 2;
 
 						var currentXDistanceImageToCenter = Math.round(((endPositionOfImageFromLeft - imageXCoordinate) * 100) / 100);
-						var currentYDistanceImageToCenter = Math.round(((endPositionOfImageFromTop - imageYCoordinate)  * 100) / 100 );
+						var currentYDistanceImageToCenter = Math.round(((endPositionOfImageFromTop - imageYCoordinate)  * 100) / 100);
 
 						if ((currentScaleX*enlargeOrShrinkBy) / (1 + enlargeOrShrinkBy) === 0) {
-							var matrix = this.getMatrix();
 							if (matrix.scaleX === 1) {
 								moveXBy = 0;
 								moveYBy = 0;
@@ -162,6 +160,7 @@ class Zoomy {
 			}
 
 		}
+
 
 		this.transform(this.el, moveXBy, moveYBy, enlargeOrShrinkBy);
 		e.preventDefault();
@@ -203,20 +202,6 @@ class Zoomy {
 		m.scaleX += enlargeOrShrinkBy;
 		m.scaleY += enlargeOrShrinkBy;
 		this.el.style.transform = 'matrix('+Object.values(m).join(', ')+')';
-	}
-
-	/**
-	 * This method checks if the element is inside the boundary element
-	 * @param {DOMRect} r
-	 * @return {boolean}
-	 */
-	isInBoundary(r) {
-		return (
-			r.top >= this.boundaryEl.offsetTop &&
-			r.left >= this.boundaryEl.offsetLeft &&
-			r.bottom <= window.innerHeight - (this.boundaryEl.offsetTop + this.boundaryEl.offsetHeight) &&
-			r.right <= window.innerWidth - (this.boundaryEl.offsetLeft + this.boundaryEl.offsetWidth)
-		);
 	}
 
 	/**
