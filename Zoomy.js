@@ -123,29 +123,28 @@ class Zoomy {
 			if (this.boundaryEl) {
 				if (!this.el.contains(e.target)) {
 					if (e.deltaY > 0) {
-						var matrix = this.getMatrix();
-
+						//calculate the end position of image, which is the center of the boundary element
 						var endPositionOfImageFromLeft = this.boundaryEl.offsetWidth / 2;
 						var endPositionOfImageFromTop = this.boundaryEl.offsetHeight / 2;
 
-						var imageXCoordinate = (this.el.offsetLeft + matrix.translateX - this.boundaryEl.offsetLeft) + this.el.width / 2;
-						var imageYCoordinate = (this.el.offsetTop + matrix.translateY - this.boundaryEl.offsetTop) + this.el.height / 2;
+						//calculate how much the image has moved from its end position
+						var widthFromImageToEndPosition = Math.round(((centerX - endPositionOfImageFromLeft - this.boundaryEl.offsetLeft + window.scrollX) * 100) / 100);
+						var heightFromImageToEndPosition = Math.round(((centerY - endPositionOfImageFromTop  - this.boundaryEl.offsetTop + window.scrollY) *100) / 100);
 
-						var currentXDistanceImageToCenter = Math.round(((endPositionOfImageFromLeft - imageXCoordinate) * 100) / 100);
-						var currentYDistanceImageToCenter = Math.round(((endPositionOfImageFromTop - imageYCoordinate)  * 100) / 100);
-
+						//check whether we have reached the last available scroll up
 						if ((currentScaleX*enlargeOrShrinkBy) / (1 + enlargeOrShrinkBy) === 0) {
-							if (matrix.scaleX === 1) {
+							console.log(currentScaleX)
+							if (currentScaleX === 1) {
 								moveXBy = 0;
 								moveYBy = 0;
 							} else {
-								moveXBy = -matrix.translateX;
-								moveYBy = -matrix.translateY;
-								enlargeOrShrinkBy = -(matrix.scaleX-1);
+								moveXBy = -widthFromImageToEndPosition;
+								moveYBy = -heightFromImageToEndPosition;
+								enlargeOrShrinkBy = -(currentScaleX-1);
 							}
 						} else {
-							moveXBy = -(currentXDistanceImageToCenter / (currentScaleX - 1) * enlargeOrShrinkBy);
-							moveYBy = -(currentYDistanceImageToCenter / (currentScaleY - 1) * enlargeOrShrinkBy);
+							moveXBy = widthFromImageToEndPosition / (currentScaleX - 1) * enlargeOrShrinkBy;
+							moveYBy = heightFromImageToEndPosition / (currentScaleY - 1) * enlargeOrShrinkBy;
 						}
 
 					}
@@ -160,7 +159,6 @@ class Zoomy {
 			}
 
 		}
-
 
 		this.transform(this.el, moveXBy, moveYBy, enlargeOrShrinkBy);
 		e.preventDefault();
