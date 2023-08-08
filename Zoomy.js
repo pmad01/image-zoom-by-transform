@@ -1,10 +1,14 @@
 class Zoomy {
-
 	/**
 	 *The HTML element we want to transform
 	 * @type {HTMLElement}
 	 */
 	el;
+
+	/**
+	 *
+	 */
+	boxEl;
 
 	/**
 	 * Checks if the element is enabled or not
@@ -49,11 +53,11 @@ class Zoomy {
 	constructor(elementId, options) {
 		this.el = document.getElementById(elementId);
 		this.options = { ...options };
-		this.boundaryEl = this.options.boundaryElementId ? document.getElementById(this.options.boundaryElementId) : null;
+		this.boxEl = this.options.boundaryElementId ? document.getElementById(this.options.boundaryElementId) : document.body;
 		this.options.zoomUpperConstraint ||= 4;
 		var fn = this.handleMouseEvents.bind(this);
-		if (this.boundaryEl) {
-			this.boundaryEl.addEventListener('wheel', fn, {passive: false});
+		if (this.boxEl) {
+			this.boxEl.addEventListener('wheel', fn, {passive: false});
 		} else {
 			this.el.addEventListener('wheel', fn, {passive: false});
 		}
@@ -97,67 +101,72 @@ class Zoomy {
 		this.lastMouseY = currentMouseY;
 
 
-		var r = this.el.getBoundingClientRect();
+		var img = this.el.getBoundingClientRect();
+		var box = this.boxEl.getBoundingClientRect();
+
 		var enlargeOrShrinkBy = 0;
 		var zoomFactor = .1;
 
 		if (e.deltaY) {
 			var mouseX = e.x,
 				mouseY = e.y,
-				centerX = r.left + r.width / 2,
-				centerY = r.top + r.height / 2,
-				newCenterXDiff = mouseX - centerX,
-				newCenterYDiff = mouseY - centerY,
-				currentScaleX = Math.round((r.width / this.el.width) * 100) / 100,
-				currentScaleY = Math.round((r.height / this.el.height) * 100) / 100;
-			    enlargeOrShrinkBy = Math.round(((e.deltaY > 0 ? -zoomFactor : zoomFactor) * currentScaleX) * 100) / 100;
+				imgCenterX = img.left + img.width / 2,
+				imgCenterY = img.top + img.height / 2,
+				boxCenterX = box.left + box.width / 2,
+				boxCenterY = box.top + box.height / 2,
+				newImageCenterXDiff = mouseX - imgCenterX,
+				newImageCenterYDiff = mouseY - imgCenterY,
+				currentScale = Math.round((img.width / this.el.width) * 10) / 10;
+
+			enlargeOrShrinkBy = Math.round(((e.deltaY > 0 ? -zoomFactor : zoomFactor) * currentScale) * 10) / 10;
 
 			// Adding upper constraint
-			if (currentScaleX + enlargeOrShrinkBy >= this.options.zoomUpperConstraint
-				|| currentScaleX + enlargeOrShrinkBy <= 1) {
-				moveXBy = 0;
-				moveYBy = 0;
+			if (currentScale + enlargeOrShrinkBy > this.options.zoomUpperConstraint
+				|| currentScale + enlargeOrShrinkBy < 1) {
 				enlargeOrShrinkBy = 0;
 			}
 
-			if (this.boundaryEl) {
+			if (this.boxEl) {
 				if (!this.el.contains(e.target)) {
 					if (e.deltaY > 0) {
-						//calculate the end position of image, which is the center of the boundary element
-						var endPositionOfImageFromLeft = this.boundaryEl.offsetWidth / 2;
-						var endPositionOfImageFromTop = this.boundaryEl.offsetHeight / 2;
+						//find out how far image is from the box center
+						var diffX = imgCenterX - boxCenterX;
+						var diffY = imgCenterY - boxCenterY;
 
-						//calculate how much the image has moved from its end position
-						var widthFromImageToEndPosition = Math.round(((centerX - endPositionOfImageFromLeft - this.boundaryEl.offsetLeft + window.scrollX) * 100) / 100);
-						var heightFromImageToEndPosition = Math.round(((centerY - endPositionOfImageFromTop  - this.boundaryEl.offsetTop + window.scrollY) *100) / 100);
+						//I am doing this to get the scale difference from the current scale to the baseline scale of 1
+						var scaleDiff = currentScale - 1;
 
-						//check whether we have reached the last available scroll up
-						if ((currentScaleX*enlargeOrShrinkBy) / (1 + enlargeOrShrinkBy) === 0) {
-							console.log(currentScaleX)
-							if (currentScaleX === 1) {
-								moveXBy = 0;
-								moveYBy = 0;
-							} else {
-								moveXBy = -widthFromImageToEndPosition;
-								moveYBy = -heightFromImageToEndPosition;
-								enlargeOrShrinkBy = -(currentScaleX-1);
-							}
-						} else {
-							moveXBy = widthFromImageToEndPosition / (currentScaleX - 1) * enlargeOrShrinkBy;
-							moveYBy = heightFromImageToEndPosition / (currentScaleY - 1) * enlargeOrShrinkBy;
-						}
+						//I am doing this to adjust the movement that is applied to the image based on the scale difference
+						var adjustedDiffX = diffX / scaleDiff;
+						var adjustedDiffY = diffY / scaleDiff
 
+						moveXBy =  adjustedDiffX * enlargeOrShrinkBy;
+						moveYBy =  adjustedDiffY * enlargeOrShrinkBy;
+
+						// console.log({
+						// 	imgCenterX,
+						// 	imgCenterY,
+						// 	boxCenterX,
+						// 	boxCenterY,
+						// 	diffX,
+						// 	diffY,
+						// 	scaleDiff,
+						// 	adjustedDiffX,
+						// 	adjustedDiffY,
+						// 	moveXBy,
+						// 	moveYBy
+						// });
 					}
-
-				} else {
-					moveXBy = -(newCenterXDiff / currentScaleX * enlargeOrShrinkBy);
-					moveYBy = -(newCenterYDiff / currentScaleY * enlargeOrShrinkBy);
 				}
-			} else {
-				moveXBy = -(newCenterXDiff / currentScaleX * enlargeOrShrinkBy);
-				moveYBy = -(newCenterYDiff / currentScaleY * enlargeOrShrinkBy);
-			}
+		    }
 
+			if (this.el.contains(e.target)) {
+				//I am doing this to adjust the movement that is applied to the image based on the current scale
+				var scaledDiffX = newImageCenterXDiff / currentScale;
+				var scaledDiffY = newImageCenterYDiff / currentScale;
+				moveXBy = -(scaledDiffX * enlargeOrShrinkBy);
+				moveYBy = -(scaledDiffY * enlargeOrShrinkBy);
+			}
 		}
 
 		this.transform(this.el, moveXBy, moveYBy, enlargeOrShrinkBy);
@@ -206,8 +215,8 @@ class Zoomy {
 	 * This method removes the event listeners from the instance element of the class.
 	 */
 	detach(){
-		if (this.boundaryEl) {
-			this.boundaryEl.removeEventListener('wheel', this.handleMouseEvents);
+		if (this.boxEl) {
+			this.boxEl.removeEventListener('wheel', this.handleMouseEvents);
 		} else {
 			this.el.removeEventListener('wheel', this.handleMouseEvents);
 		}
