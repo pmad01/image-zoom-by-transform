@@ -128,7 +128,7 @@ class Zoomy {
 				enlargeOrShrinkBy = 0;
 			}
 
-			var ElContainsTarget = !this.el.contains(e.target);
+			var ElContainsTarget = this.el.contains(e.target);
 			var hasBoxEl = this.boxEl;
 			var isShrinking = e.deltaY > 0;
 			if (!ElContainsTarget) {
