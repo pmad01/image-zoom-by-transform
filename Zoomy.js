@@ -6,7 +6,7 @@ class Zoomy {
 	el;
 
 	/**
-	 *
+	 *The box element that contains the image
 	 * @type {HTMLElement}
 	 */
 	boxEl;
