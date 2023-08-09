@@ -7,6 +7,7 @@ class Zoomy {
 
 	/**
 	 *
+	 * @type {HTMLElement}
 	 */
 	boxEl;
 
@@ -118,49 +119,52 @@ class Zoomy {
 				newImageCenterYDiff = mouseY - imgCenterY,
 				currentScale = Math.round((img.width / this.el.width) * 10) / 10;
 
-			enlargeOrShrinkBy = Math.round(((e.deltaY > 0 ? -zoomFactor : zoomFactor) * currentScale) * 10) / 10;
+			enlargeOrShrinkBy = (e.deltaY > 0 ? -zoomFactor : zoomFactor) * currentScale;
+			enlargeOrShrinkBy = Math.round(enlargeOrShrinkBy * 10) / 10;
 
 			// Adding upper constraint
-			if (currentScale + enlargeOrShrinkBy > this.options.zoomUpperConstraint
-				|| currentScale + enlargeOrShrinkBy < 1) {
+			var newScale = currentScale + enlargeOrShrinkBy;
+			if (newScale> this.options.zoomUpperConstraint || newScale < 1) {
 				enlargeOrShrinkBy = 0;
 			}
 
-			if (this.boxEl) {
-				if (!this.el.contains(e.target)) {
+			if (!this.el.contains(e.target)) {
+				if (this.boxEl) {
 					if (e.deltaY > 0) {
 						//find out how far image is from the box center
 						var diffX = imgCenterX - boxCenterX;
 						var diffY = imgCenterY - boxCenterY;
 
-						//I am doing this to get the scale difference from the current scale to the baseline scale of 1
+						//I am doing this to calculate how many times the image has enlarged compared to the original size
 						var scaleDiff = currentScale - 1;
 
 						//I am doing this to adjust the movement that is applied to the image based on the scale difference
 						var adjustedDiffX = diffX / scaleDiff;
-						var adjustedDiffY = diffY / scaleDiff
+						var adjustedDiffY = diffY / scaleDiff;
 
-						moveXBy =  adjustedDiffX * enlargeOrShrinkBy;
-						moveYBy =  adjustedDiffY * enlargeOrShrinkBy;
+						//I am doing this multiplication to adjust dhe difference based on how much we are shrinking,
+						//so that every shrinkage the transition back to the box center is done smoothly, as it shrinks,
+						//it also goes back synchronously
+						moveXBy = adjustedDiffX * enlargeOrShrinkBy;
+						moveYBy = adjustedDiffY * enlargeOrShrinkBy;
 
-						// console.log({
-						// 	imgCenterX,
-						// 	imgCenterY,
-						// 	boxCenterX,
-						// 	boxCenterY,
-						// 	diffX,
-						// 	diffY,
-						// 	scaleDiff,
-						// 	adjustedDiffX,
-						// 	adjustedDiffY,
-						// 	moveXBy,
-						// 	moveYBy
-						// });
+						console.log({
+							imgCenterX,
+							imgCenterY,
+							boxCenterX,
+							boxCenterY,
+							diffX,
+							diffY,
+							scaleDiff,
+							adjustedDiffX,
+							adjustedDiffY,
+							enlargeOrShrinkBy,
+							moveXBy,
+							moveYBy
+						});
 					}
 				}
-		    }
-
-			if (this.el.contains(e.target)) {
+			} else {
 				//I am doing this to adjust the movement that is applied to the image based on the current scale
 				var scaledDiffX = newImageCenterXDiff / currentScale;
 				var scaledDiffY = newImageCenterYDiff / currentScale;
