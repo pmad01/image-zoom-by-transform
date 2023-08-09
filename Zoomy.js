@@ -128,9 +128,11 @@ class Zoomy {
 				enlargeOrShrinkBy = 0;
 			}
 
-			if (!this.el.contains(e.target)) {
-				if (this.boxEl) {
-					if (e.deltaY > 0) {
+			var ElContainsTarget = !this.el.contains(e.target);
+			var hasBoxEl = this.boxEl;
+			var isShrinking = e.deltaY > 0;
+			if (!ElContainsTarget) {
+				if (hasBoxEl && isShrinking) {
 						//find out how far image is from the box center
 						var diffX = imgCenterX - boxCenterX;
 						var diffY = imgCenterY - boxCenterY;
@@ -162,7 +164,6 @@ class Zoomy {
 							moveXBy,
 							moveYBy
 						});
-					}
 				}
 			} else {
 				//I am doing this to adjust the movement that is applied to the image based on the current scale
