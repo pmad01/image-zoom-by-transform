@@ -122,9 +122,12 @@ class Zoomy {
 			enlargeOrShrinkBy = (e.deltaY > 0 ? -zoomFactor : zoomFactor) * currentScale;
 			enlargeOrShrinkBy = Math.round(enlargeOrShrinkBy * 10) / 10;
 
-			// Adding upper constraint
 			var newScale = currentScale + enlargeOrShrinkBy;
-			if (newScale> this.options.zoomUpperConstraint || newScale < 1) {
+
+			if (
+				newScale > this.options.zoomUpperConstraint || //upper limit
+				newScale < 1 //lower limit
+			) {
 				enlargeOrShrinkBy = 0;
 			}
 
@@ -133,22 +136,21 @@ class Zoomy {
 			var isShrinking = e.deltaY > 0;
 			if (!ElContainsTarget) {
 				if (hasBoxEl && isShrinking) {
-						//find out how far image is from the box center
+						//get distance between image's center and the center of the box
 						var diffX = imgCenterX - boxCenterX;
 						var diffY = imgCenterY - boxCenterY;
 
-						//I am doing this to calculate how many times the image has enlarged compared to the original size
-						var scaleDiff = currentScale - 1;
+						var scaleDiff = 1 - currentScale;
 
-						//I am doing this to adjust the movement that is applied to the image based on the scale difference
+						//ratio of distance to scaling
 						var adjustedDiffX = diffX / scaleDiff;
 						var adjustedDiffY = diffY / scaleDiff;
 
 						//I am doing this multiplication to adjust dhe difference based on how much we are shrinking,
 						//so that every shrinkage the transition back to the box center is done smoothly, as it shrinks,
 						//it also goes back synchronously
-						moveXBy = adjustedDiffX * enlargeOrShrinkBy;
-						moveYBy = adjustedDiffY * enlargeOrShrinkBy;
+						moveXBy = -adjustedDiffX * enlargeOrShrinkBy;
+						moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
 
 						console.log({
 							imgCenterX,
@@ -166,6 +168,10 @@ class Zoomy {
 						});
 				}
 			} else {
+				if (this.imageFits()) {
+					newImageCenterXDiff = 0;
+					newImageCenterYDiff = 0;
+				}
 				//I am doing this to adjust the movement that is applied to the image based on the current scale
 				var scaledDiffX = newImageCenterXDiff / currentScale;
 				var scaledDiffY = newImageCenterYDiff / currentScale;
@@ -214,6 +220,17 @@ class Zoomy {
 		m.scaleX += enlargeOrShrinkBy;
 		m.scaleY += enlargeOrShrinkBy;
 		this.el.style.transform = 'matrix('+Object.values(m).join(', ')+')';
+	}
+
+	/**
+	 *Checks if the image fits inside the box.
+	 * @return {boolean}
+	 */
+	imageFits() {
+		var img = this.el.getBoundingClientRect();
+		var box = this.boxEl.getBoundingClientRect();
+
+		return img.width <= box.width && img.height <= box.height;
 	}
 
 	/**
