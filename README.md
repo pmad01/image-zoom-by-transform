@@ -18,4 +18,4 @@ With this library, you can provide your users with a good experience when explor
 
 # Demo
 
-This is a [Demo](http://htmlpreview.github.io/?https://github.com/pmad01/image-zoom-by-transform/blob/main/Version%202/v2.html)
+This is a [Demo](http://htmlpreview.github.io/?https://github.com/pmad01/image-zoom-by-transform/blob/main/demo.html)
