@@ -77,12 +77,16 @@ class Zoomy {
 	 * @param {Event} e
 	 */
 	transformByMouseEvent(e) {
-
 		const currentMouseX = e.x;
 		const currentMouseY = e.y;
-
 		var moveXBy = 0;
 		var moveYBy = 0;
+		var img = this.el.getBoundingClientRect();
+		var box = this.boxEl.getBoundingClientRect();
+		var widthFits = img.width <= box.width;
+		var heightFits = img.height <= box.height;
+		var heightInsideCanvas = (img.top >= box.top && img.bottom <= box.bottom);
+		var widthInsideCanvas = (img.left >= box.left && img.right <= box.right);
 
 		this.isDragging = false;
 		if (e.type === 'mousedown') {
@@ -95,15 +99,17 @@ class Zoomy {
 			this.isDragging = true;
 		}
 		if (this.isDragging) {
-			moveXBy += currentMouseX - this.lastMouseX;
-			moveYBy += currentMouseY - this.lastMouseY;
+			if (!widthFits && !widthInsideCanvas) {
+					moveXBy += currentMouseX - this.lastMouseX;
+			}
+			if (!heightFits && !heightInsideCanvas) {
+				    moveYBy += currentMouseY - this.lastMouseY;
+			}
+
 		}
+
 		this.lastMouseX = currentMouseX;
 		this.lastMouseY = currentMouseY;
-
-
-		var img = this.el.getBoundingClientRect();
-		var box = this.boxEl.getBoundingClientRect();
 
 		var enlargeOrShrinkBy = 0;
 		var zoomFactor = .1;
@@ -168,7 +174,7 @@ class Zoomy {
 						});
 				}
 			} else {
-				if (this.imageFits()) {
+				if (widthFits && heightFits && widthInsideCanvas && heightInsideCanvas) {
 					newImageCenterXDiff = 0;
 					newImageCenterYDiff = 0;
 				}
@@ -220,17 +226,6 @@ class Zoomy {
 		m.scaleX += enlargeOrShrinkBy;
 		m.scaleY += enlargeOrShrinkBy;
 		this.el.style.transform = 'matrix('+Object.values(m).join(', ')+')';
-	}
-
-	/**
-	 *Checks if the image fits inside the box.
-	 * @return {boolean}
-	 */
-	imageFits() {
-		var img = this.el.getBoundingClientRect();
-		var box = this.boxEl.getBoundingClientRect();
-
-		return img.width <= box.width && img.height <= box.height;
 	}
 
 	/**
