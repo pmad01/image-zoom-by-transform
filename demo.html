@@ -14,14 +14,16 @@
       height: 300px;
     }
     #myBoundaryElement {
-
+      margin-left:10%;
         height: 700px;
+        max-width: 70%;
         border: 1px solid red;
         background-color: #f8f8f8;
         overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
+      resize: both;
     }
   </style>
   <script src="Zoomy.js"></script>
@@ -32,9 +34,10 @@
 <h1>Zoomy Test Page</h1>
 
 
-<div id="myBoundaryElement">
+<div id="myBoundaryElement" resizable="true">
         <img class="zoomables" id="zoomy1" src="https://media.istockphoto.com/id/1146517111/photo/taj-mahal-mausoleum-in-agra.jpg?s=612x612&w=0&k=20&c=vcIjhwUrNyjoKbGbAQ5sOcEzDUgOfCsm9ySmJ8gNeRk=" alt="Image 1">
 </div>
+
 <button onclick="zoomy1.enable()">Enable</button>
 <button onclick="zoomy1.disable()">Disable</button>
 

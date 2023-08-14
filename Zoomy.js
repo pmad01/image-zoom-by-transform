@@ -77,12 +77,17 @@ class Zoomy {
 	 * @param {Event} e
 	 */
 	transformByMouseEvent(e) {
-
 		const currentMouseX = e.x;
 		const currentMouseY = e.y;
-
 		var moveXBy = 0;
 		var moveYBy = 0;
+		var img = this.el.getBoundingClientRect();
+		var box = this.boxEl.getBoundingClientRect();
+		var widthFits = img.width <= box.width;
+		var heightFits = img.height <= box.height;
+		var heightInsideCanvas = (img.top >= box.top && img.bottom <= box.bottom);
+		var widthInsideCanvas = (img.left >= box.left && img.right <= box.right);
+
 
 		this.isDragging = false;
 		if (e.type === 'mousedown') {
@@ -94,35 +99,100 @@ class Zoomy {
 		if (this.mouseIsDown && e.type === 'mousemove') {
 			this.isDragging = true;
 		}
+		
 		if (this.isDragging) {
-			moveXBy += currentMouseX - this.lastMouseX;
-			moveYBy += currentMouseY - this.lastMouseY;
+			var oldLeft = img.left,
+				newLeft = oldLeft + (currentMouseX - this.lastMouseX),
+				oldRight = img.right,
+				newRight = oldRight + (currentMouseX - this.lastMouseX),
+				oldTop = img.top,
+				newTop = oldTop + (currentMouseY - this.lastMouseY),
+				oldBottom = img.bottom,
+				newBottom = oldBottom + (currentMouseY - this.lastMouseY);
+			// console.log({
+			// 	oldLeft,
+			// 	newLeft,
+			// 	oldRight,
+			// 	newRight,
+			// 	oldTop,
+			// 	newTop,
+			// 	oldBottom,
+			// 	newBottom
+			// });
+
+			//flag to check if image can freely be moves on the x-axis(horizontally)
+			var freeX = (
+					img.width > box.width || // image overflows canvas
+					!widthInsideCanvas // or simply positioned off canvas
+				) &&
+				!(
+					(newLeft < box.left && //hard left wall
+						(
+							newLeft <= oldLeft && //if going left
+							newRight <= box.right //or right edge is visible
+						)
+					) ||
+					(newRight > box.right && //hard right wall
+						(
+							newRight >= oldRight && //if going right
+							newLeft >= box.left //or left edge is visible
+						)
+					)
+				);
+
+			//flag to check if image can freely be moves on the y-axis(vertically)
+			var freeY = (
+				img.height > box.height || // image bigger than canvas
+				!heightInsideCanvas // or image outside of canvas
+			) && !(
+				(newTop < box.top && //hard ceiling
+					(
+						newTop <= oldTop && //if going up
+						newBottom <= box.bottom //or bottom is visible
+					)
+				) ||
+				(newBottom > box.bottom && //hard floor
+					(
+						newBottom >= oldBottom && //if going down
+						newTop >= box.top //or top is visible
+					)
+				)
+			);
+
+			// !(a || b) === !a && !b
+
+			if (freeX) {
+				moveXBy = currentMouseX - this.lastMouseX;
+			}
+			if (freeY) {
+				moveYBy = currentMouseY - this.lastMouseY;
+			}
+
 		}
-		this.lastMouseX = currentMouseX;
-		this.lastMouseY = currentMouseY;
-
-
-		var img = this.el.getBoundingClientRect();
-		var box = this.boxEl.getBoundingClientRect();
 
 		var enlargeOrShrinkBy = 0;
 		var zoomFactor = .1;
 
 		if (e.deltaY) {
-			var mouseX = e.x,
-				mouseY = e.y,
-				imgCenterX = img.left + img.width / 2,
+			var imgCenterX = img.left + img.width / 2,
 				imgCenterY = img.top + img.height / 2,
 				boxCenterX = box.left + box.width / 2,
 				boxCenterY = box.top + box.height / 2,
-				newImageCenterXDiff = mouseX - imgCenterX,
-				newImageCenterYDiff = mouseY - imgCenterY,
+				newImageCenterXDiff = currentMouseX - imgCenterX,
+				newImageCenterYDiff = currentMouseY - imgCenterY,
 				currentScale = Math.round((img.width / this.el.width) * 10) / 10;
 
 			enlargeOrShrinkBy = (e.deltaY > 0 ? -zoomFactor : zoomFactor) * currentScale;
 			enlargeOrShrinkBy = Math.round(enlargeOrShrinkBy * 10) / 10;
 
 			var newScale = currentScale + enlargeOrShrinkBy;
+
+			if (widthFits || widthInsideCanvas) {
+				newImageCenterXDiff = 0;
+			}
+			if (heightFits || heightInsideCanvas) {
+				newImageCenterYDiff = 0;
+			}
 
 			if (
 				newScale > this.options.zoomUpperConstraint || //upper limit
@@ -136,52 +206,52 @@ class Zoomy {
 			var isShrinking = e.deltaY > 0;
 			if (!ElContainsTarget) {
 				if (hasBoxEl && isShrinking) {
-						//get distance between image's center and the center of the box
-						var diffX = imgCenterX - boxCenterX;
-						var diffY = imgCenterY - boxCenterY;
+					//get distance between image's center and the center of the box
+					var diffX = imgCenterX - boxCenterX;
+					var diffY = imgCenterY - boxCenterY;
 
-						var scaleDiff = 1 - currentScale;
+					var scaleDiff = 1 - currentScale;
 
-						//ratio of distance to scaling
-						var adjustedDiffX = diffX / scaleDiff;
-						var adjustedDiffY = diffY / scaleDiff;
+					//ratio of distance to scaling
+					var adjustedDiffX = diffX / scaleDiff;
+					var adjustedDiffY = diffY / scaleDiff;
 
-						//I am doing this multiplication to adjust dhe difference based on how much we are shrinking,
-						//so that every shrinkage the transition back to the box center is done smoothly, as it shrinks,
-						//it also goes back synchronously
-						moveXBy = -adjustedDiffX * enlargeOrShrinkBy;
-						moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
+					//I am doing this multiplication to adjust dhe difference based on how much we are shrinking,
+					//so that every shrinkage the transition back to the box center is done smoothly, as it shrinks,
+					//it also goes back synchronously
+					moveXBy = -adjustedDiffX * enlargeOrShrinkBy;
+					moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
 
-						console.log({
-							imgCenterX,
-							imgCenterY,
-							boxCenterX,
-							boxCenterY,
-							diffX,
-							diffY,
-							scaleDiff,
-							adjustedDiffX,
-							adjustedDiffY,
-							enlargeOrShrinkBy,
-							moveXBy,
-							moveYBy
-						});
+					// console.log({
+					// 	imgCenterX,
+					// 	imgCenterY,
+					// 	boxCenterX,
+					// 	boxCenterY,
+					// 	diffX,
+					// 	diffY,
+					// 	scaleDiff,
+					// 	adjustedDiffX,
+					// 	adjustedDiffY,
+					// 	enlargeOrShrinkBy,
+					// 	moveXBy,
+					// 	moveYBy
+					// });
 				}
 			} else {
-				if (this.imageFits()) {
-					newImageCenterXDiff = 0;
-					newImageCenterYDiff = 0;
-				}
 				//I am doing this to adjust the movement that is applied to the image based on the current scale
-				var scaledDiffX = newImageCenterXDiff / currentScale;
-				var scaledDiffY = newImageCenterYDiff / currentScale;
-				moveXBy = -(scaledDiffX * enlargeOrShrinkBy);
-				moveYBy = -(scaledDiffY * enlargeOrShrinkBy);
+				 adjustedDiffX = newImageCenterXDiff / currentScale;
+				 adjustedDiffY = newImageCenterYDiff / currentScale;
+				 moveXBy = -(adjustedDiffX * enlargeOrShrinkBy);
+				 moveYBy = -(adjustedDiffY * enlargeOrShrinkBy);
 			}
+
 		}
 
 		this.transform(this.el, moveXBy, moveYBy, enlargeOrShrinkBy);
 		e.preventDefault();
+
+		this.lastMouseX = currentMouseX;
+		this.lastMouseY = currentMouseY;
 	}
 
 	/**
@@ -220,17 +290,6 @@ class Zoomy {
 		m.scaleX += enlargeOrShrinkBy;
 		m.scaleY += enlargeOrShrinkBy;
 		this.el.style.transform = 'matrix('+Object.values(m).join(', ')+')';
-	}
-
-	/**
-	 *Checks if the image fits inside the box.
-	 * @return {boolean}
-	 */
-	imageFits() {
-		var img = this.el.getBoundingClientRect();
-		var box = this.boxEl.getBoundingClientRect();
-
-		return img.width <= box.width && img.height <= box.height;
 	}
 
 	/**

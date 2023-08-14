@@ -5,16 +5,79 @@ With this library, you can provide your users with a good experience when explor
 
 # Features
 
-* Smooth and fluid zooming with customizable zoom levels.
-* Pan across zoomed images effortlessly using simple drag gestures.
-* Highly customizable and easy to integrate into your existing projects.
+- Effortless zooming and panning for images within an HTML container.
+
+- Seamlessly handle mouse wheel events for zooming.
+
+- Intuitive drag-and-drop functionality for panning.
+
+- Customizable upper zoom constraint to prevent excessive zooming.
+
+- Ability to set a boundary element for the zooming and panning area.
+
+- Lightweight and easy-to-use.
 
 # How to use
 
-* By mouse
-  Hold down the left mouse button and release when over to pan. To zoom, scroll down to zoom in and scroll up to zoom out.
-* By touchpad
-  Click and hold to pan. Pinch-in to zoom in and pinch-out to zoom out.
+## Getting Started
+
+Follow these steps to integrate Zoomy into your project:
+
+1\. Include the `Zoomy.js` file in your HTML:
+
+```html
+
+<script src="path/to/Zoomy.js"></script>
+
+```
+
+2\. Create an HTML container with an image you want to enable zooming for:
+
+```html
+
+<div id="zoomy-container">
+
+    <img src="path/to/your/image.jpg" alt="Zoomable Image">
+
+</div>
+
+```
+
+3\. Initialize Zoomy by creating an instance with the container element's ID and optional configuration options:
+
+```javascript
+
+const options = {
+
+    boundaryElementId: 'boundary-container', // ID of the boundary element (optional)
+
+    zoomUpperConstraint: 4, // Upper limit for zooming (optional)
+
+};
+
+const zoomyInstance = new Zoomy('zoomy-container', options);
+
+```
+
+4\. Enjoy zooming and panning capabilities for your image!
+
+## Configuration Options
+
+Zoomy provides configuration options to customize its behavior:
+
+- `boundaryElementId`: Specifies the ID of the boundary element to constrain the zoom and pan area. If not provided, the entire body is used as the boundary.
+
+- `zoomUpperConstraint`: Sets the upper limit for zooming. Images will not be scaled beyond this value.
+
+## Methods
+
+Zoomy offers additional methods to control its behavior:
+
+- `enable()`: Enables zooming and panning functionality (enabled by default).
+
+- `disable()`: Disables zooming and panning functionality.
+
+- `detach()`: Removes event listeners and disables Zoomy.
 
 # Demo
 
