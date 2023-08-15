@@ -99,7 +99,7 @@ class Zoomy {
 		if (this.mouseIsDown && e.type === 'mousemove') {
 			this.isDragging = true;
 		}
-		
+
 		if (this.isDragging) {
 			var oldLeft = img.left,
 				newLeft = oldLeft + (currentMouseX - this.lastMouseX),
@@ -244,6 +244,71 @@ class Zoomy {
 				 moveXBy = -(adjustedDiffX * enlargeOrShrinkBy);
 				 moveYBy = -(adjustedDiffY * enlargeOrShrinkBy);
 			}
+
+			    if (isShrinking) {
+				        oldLeft = img.left,
+					    newLeft = oldLeft + moveXBy,
+					    oldRight = img.right,
+					    newRight = oldRight + moveXBy,
+					    oldTop = img.top,
+					    newTop = oldTop + moveYBy,
+					    oldBottom = img.bottom,
+					    newBottom = oldBottom + moveYBy;
+
+					var oldWidth = img.width;
+
+					var newWidth = img.width - this.el.offsetWidth * enlargeOrShrinkBy;
+
+				    freeX = (
+						    img.width > box.width || // image overflows canvas
+						    !widthInsideCanvas // or simply positioned off canvas
+					    ) &&
+					    !(
+						    (newLeft < box.left && //hard left wall
+							    (
+								    newLeft <= oldLeft && //if going left
+								    newRight <= box.right //or right edge is visible
+							    )
+						    ) ||
+						    (newRight > box.right && //hard right wall
+							    (
+								    newRight >= oldRight && //if going right
+								    newLeft >= box.left //or left edge is visible
+							    )
+						    )
+					    );
+
+				    //flag to check if image can freely be moves on the y-axis(vertically)
+				     freeY = (
+					    img.height > box.height || // image bigger than canvas
+					    !heightInsideCanvas // or image outside of canvas
+				    ) && !(
+					    (newTop < box.top && //hard ceiling
+						    (
+							    newTop <= oldTop && //if going up
+							    newBottom <= box.bottom //or bottom is visible
+						    )
+					    ) ||
+					    (newBottom > box.bottom && //hard floor
+						    (
+							    newBottom >= oldBottom && //if going down
+							    newTop >= box.top //or top is visible
+						    )
+					    )
+				    );
+
+				    if (!widthFits) {
+					    console.log("Width does not fit")
+						// moveXBy = ;
+				    }
+
+				    if (!heightFits) {
+					    console.log("Height does not fit")
+						// moveYBy = ;
+				    }
+			    }
+
+
 
 		}
 
