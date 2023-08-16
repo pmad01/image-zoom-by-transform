@@ -77,16 +77,23 @@ class Zoomy {
 	 * @param {Event} e
 	 */
 	transformByMouseEvent(e) {
-		const currentMouseX = e.x;
-		const currentMouseY = e.y;
-		var moveXBy = 0;
-		var moveYBy = 0;
-		var img = this.el.getBoundingClientRect();
-		var box = this.boxEl.getBoundingClientRect();
-		var widthFits = img.width <= box.width;
-		var heightFits = img.height <= box.height;
-		var heightInsideCanvas = (img.top >= box.top && img.bottom <= box.bottom);
-		var widthInsideCanvas = (img.left >= box.left && img.right <= box.right);
+		var currentMouseX = e.x,
+			currentMouseY = e.y,
+			moveXBy = 0,
+			moveYBy = 0,
+			img = this.el.getBoundingClientRect(),
+			box = this.boxEl.getBoundingClientRect(),
+			widthFits = img.width <= box.width,
+			heightFits = img.height <= box.height,
+			heightInsideCanvas = (img.top >= box.top && img.bottom <= box.bottom),
+			widthInsideCanvas = (img.left >= box.left && img.right <= box.right),
+			currentLeft = img.left,
+			currentRight = img.right,
+			currentTop = img.top,
+			currentBottom = img.bottom,
+			enlargeOrShrinkBy = 0,
+			zoomFactor = .1,
+			currentScale = img.width / this.el.offsetWidth;
 
 
 		this.isDragging = false;
@@ -101,22 +108,18 @@ class Zoomy {
 		}
 
 		if (this.isDragging) {
-			var oldLeft = img.left,
-				newLeft = oldLeft + (currentMouseX - this.lastMouseX),
-				oldRight = img.right,
-				newRight = oldRight + (currentMouseX - this.lastMouseX),
-				oldTop = img.top,
-				newTop = oldTop + (currentMouseY - this.lastMouseY),
-				oldBottom = img.bottom,
-				newBottom = oldBottom + (currentMouseY - this.lastMouseY);
+			var newLeft = currentLeft + (currentMouseX - this.lastMouseX),
+			newRight = currentRight + (currentMouseX - this.lastMouseX),
+			newTop = currentTop + (currentMouseY - this.lastMouseY),
+			newBottom = currentBottom + (currentMouseY - this.lastMouseY);
 			// console.log({
-			// 	oldLeft,
+			// 	currentLeft,
 			// 	newLeft,
-			// 	oldRight,
+			// 	currentRight,
 			// 	newRight,
-			// 	oldTop,
+			// 	currentTo[,
 			// 	newTop,
-			// 	oldBottom,
+			// 	currentBottom,
 			// 	newBottom
 			// });
 
@@ -128,13 +131,13 @@ class Zoomy {
 				!(
 					(newLeft < box.left && //hard left wall
 						(
-							newLeft <= oldLeft && //if going left
+							newLeft <= currentLeft && //if going left
 							newRight <= box.right //or right edge is visible
 						)
 					) ||
 					(newRight > box.right && //hard right wall
 						(
-							newRight >= oldRight && //if going right
+							newRight >= currentRight && //if going right
 							newLeft >= box.left //or left edge is visible
 						)
 					)
@@ -147,13 +150,13 @@ class Zoomy {
 			) && !(
 				(newTop < box.top && //hard ceiling
 					(
-						newTop <= oldTop && //if going up
+						newTop <= currentTop && //if going up
 						newBottom <= box.bottom //or bottom is visible
 					)
 				) ||
 				(newBottom > box.bottom && //hard floor
 					(
-						newBottom >= oldBottom && //if going down
+						newBottom >= currentBottom && //if going down
 						newTop >= box.top //or top is visible
 					)
 				)
@@ -170,8 +173,7 @@ class Zoomy {
 
 		}
 
-		var enlargeOrShrinkBy = 0;
-		var zoomFactor = .1;
+
 
 		if (e.deltaY) {
 			var imgCenterX = img.left + img.width / 2,
@@ -179,11 +181,10 @@ class Zoomy {
 				boxCenterX = box.left + box.width / 2,
 				boxCenterY = box.top + box.height / 2,
 				newImageCenterXDiff = currentMouseX - imgCenterX,
-				newImageCenterYDiff = currentMouseY - imgCenterY,
-				currentScale = Math.round((img.width / this.el.width) * 10) / 10;
+				newImageCenterYDiff = currentMouseY - imgCenterY;
 
 			enlargeOrShrinkBy = (e.deltaY > 0 ? -zoomFactor : zoomFactor) * currentScale;
-			enlargeOrShrinkBy = Math.round(enlargeOrShrinkBy * 10) / 10;
+			// enlargeOrShrinkBy = Math.round(enlargeOrShrinkBy * 10) / 10;
 
 			var newScale = currentScale + enlargeOrShrinkBy;
 
@@ -196,16 +197,15 @@ class Zoomy {
 
 			if (
 				newScale > this.options.zoomUpperConstraint || //upper limit
-				newScale < 1 //lower limit
+				newScale < .9 //lower limit
 			) {
 				enlargeOrShrinkBy = 0;
 			}
 
 			var ElContainsTarget = this.el.contains(e.target);
-			var hasBoxEl = this.boxEl;
 			var isShrinking = e.deltaY > 0;
 			if (!ElContainsTarget) {
-				if (hasBoxEl && isShrinking) {
+				if (isShrinking) {
 					//get distance between image's center and the center of the box
 					var diffX = imgCenterX - boxCenterX;
 					var diffY = imgCenterY - boxCenterY;
@@ -221,7 +221,7 @@ class Zoomy {
 					//it also goes back synchronously
 					moveXBy = -adjustedDiffX * enlargeOrShrinkBy;
 					moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
-
+					//
 					// console.log({
 					// 	imgCenterX,
 					// 	imgCenterY,
@@ -241,45 +241,45 @@ class Zoomy {
 				//I am doing this to adjust the movement that is applied to the image based on the current scale
 				 adjustedDiffX = newImageCenterXDiff / currentScale;
 				 adjustedDiffY = newImageCenterYDiff / currentScale;
-				 moveXBy = -(adjustedDiffX * enlargeOrShrinkBy);
-				 moveYBy = -(adjustedDiffY * enlargeOrShrinkBy);
+				 moveXBy = -adjustedDiffX * enlargeOrShrinkBy;
+				 moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
 			}
 
-			    if (isShrinking) {
-				        oldLeft = img.left,
-					    newLeft = oldLeft + moveXBy,
-					    oldRight = img.right,
-					    newRight = oldRight + moveXBy,
-					    oldTop = img.top,
-					    newTop = oldTop + moveYBy,
-					    oldBottom = img.bottom,
-					    newBottom = oldBottom + moveYBy;
 
-					var oldWidth = img.width;
+			if (isShrinking && !freeX) {
 
-					var newWidth = img.width - this.el.offsetWidth * enlargeOrShrinkBy;
+				//goal: if the image is wider than the container
+				// we don’t want the left edge of image to go past the left edge of the container
 
-				    if ((!widthFits || !widthInsideCanvas) && newRight >= oldRight && newLeft >= box.left) {
-					    console.log("Width does not fit, image moving right");
-						 moveXBy = -(newWidth - oldWidth) / 2;
-				    }
+				var newWidth = this.el.offsetWidth * newScale;
+				var widthShrankBy = newWidth - img.width;
+				var oneSideWidthShrankBy = widthShrankBy/ 2;
 
-				    if ((!widthFits || !widthInsideCanvas) && newLeft <= oldLeft && newRight <= box.right) {
-					    console.log("Width does not fit, image moving left");
-					    moveXBy = (newWidth - oldWidth) / 2;
-				    }
+				var newHeight = this.el.offsetHeight * newScale;
+				var heightShrankBy = newHeight - img.height;
+				var oneSideHeightShrankBy = heightShrankBy/ 2;
 
-				    if ((!heightFits || !heightInsideCanvas) && newBottom >= oldBottom && newTop >= box.top) {
-					    console.log("Height does not fit, image moving up");
-						moveYBy = -(newWidth - oldWidth) / 2;
-				    }
+				newLeft = currentLeft + (moveXBy - oneSideWidthShrankBy);
+				newRight = currentRight + (moveXBy + oneSideWidthShrankBy);
+				newTop = currentTop + (moveYBy - oneSideHeightShrankBy);
+				newBottom = currentBottom + (moveYBy + oneSideHeightShrankBy);
 
-				    if ((!heightFits || !heightInsideCanvas) && newTop <= oldTop && newBottom <= box.bottom) {
-					    console.log("Height does not fit, image moving down");
-					    moveYBy = (newWidth - oldWidth) / 2;
-				    }
-
-			    }
+				console.log({
+					newScale,
+					moveXBy,
+					moveYBy,
+					currentLeft,
+					newLeft,
+					currentRight,
+					newRight,
+					currentTop,
+					newTop,
+					currentBottom,
+					newBottom,
+					oneSideWidthShrankBy,
+					oneSideHeightShrankBy
+				});
+			}
 		}
 
 		this.transform(this.el, moveXBy, moveYBy, enlargeOrShrinkBy);
