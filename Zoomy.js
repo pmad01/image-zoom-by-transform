@@ -95,7 +95,6 @@ class Zoomy {
 			zoomFactor = .1,
 			currentScale = img.width / this.el.offsetWidth;
 
-
 		this.isDragging = false;
 		if (e.type === 'mousedown') {
 			this.mouseIsDown = true;
@@ -162,8 +161,6 @@ class Zoomy {
 				)
 			);
 
-			// !(a || b) === !a && !b
-
 			if (freeX) {
 				moveXBy = currentMouseX - this.lastMouseX;
 			}
@@ -172,8 +169,6 @@ class Zoomy {
 			}
 
 		}
-
-
 
 		if (e.deltaY) {
 			var imgCenterX = img.left + img.width / 2,
@@ -238,47 +233,81 @@ class Zoomy {
 					// });
 				}
 			} else {
-				//I am doing this to adjust the movement that is applied to the image based on the current scale
-				 adjustedDiffX = newImageCenterXDiff / currentScale;
-				 adjustedDiffY = newImageCenterYDiff / currentScale;
-				 moveXBy = -adjustedDiffX * enlargeOrShrinkBy;
-				 moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
-			}
+				 if (!widthFits && !heightFits) {
+					 //I am doing this to adjust the movement that is applied to the image based on the current scale
+					 adjustedDiffX = newImageCenterXDiff / currentScale;
+					 adjustedDiffY = newImageCenterYDiff / currentScale;
+					 moveXBy = -adjustedDiffX * enlargeOrShrinkBy;
+					 moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
+				 }
 
+				 if (isShrinking) {
+					var newWidth = this.el.offsetWidth * newScale;
+					var widthShrankBy = newWidth - img.width;
+					var oneSideWidthShrankBy = widthShrankBy / 2;
 
-			if (isShrinking && !freeX) {
+					var newHeight = this.el.offsetHeight * newScale;
+					var heightShrankBy = newHeight - img.height;
+					var oneSideHeightShrankBy = heightShrankBy / 2;
 
-				//goal: if the image is wider than the container
-				// we don’t want the left edge of image to go past the left edge of the container
+					var horizontalMove = moveXBy - oneSideWidthShrankBy;
+					var verticalMove = moveYBy - oneSideHeightShrankBy;
 
-				var newWidth = this.el.offsetWidth * newScale;
-				var widthShrankBy = newWidth - img.width;
-				var oneSideWidthShrankBy = widthShrankBy/ 2;
+					newLeft = currentLeft + horizontalMove;
+					newRight = newLeft + newWidth;
+					newTop = currentTop + verticalMove;
+					newBottom = newTop + newHeight;
 
-				var newHeight = this.el.offsetHeight * newScale;
-				var heightShrankBy = newHeight - img.height;
-				var oneSideHeightShrankBy = heightShrankBy/ 2;
+					var visualMargin = 10;
 
-				newLeft = currentLeft + (moveXBy - oneSideWidthShrankBy);
-				newRight = currentRight + (moveXBy + oneSideWidthShrankBy);
-				newTop = currentTop + (moveYBy - oneSideHeightShrankBy);
-				newBottom = currentBottom + (moveYBy + oneSideHeightShrankBy);
+					if (!widthFits) {
+						if (newLeft > currentLeft) {
+							var newLeftDistance = box.left - newLeft;
+							var movesRightTooMuch = newLeftDistance < -visualMargin;
 
-				console.log({
-					newScale,
-					moveXBy,
-					moveYBy,
-					currentLeft,
-					newLeft,
-					currentRight,
-					newRight,
-					currentTop,
-					newTop,
-					currentBottom,
-					newBottom,
-					oneSideWidthShrankBy,
-					oneSideHeightShrankBy
-				});
+							if (movesRightTooMuch) {
+								moveXBy += newLeftDistance + visualMargin;
+							}
+						}
+
+						if (newRight < currentRight) {
+							var newRightDistance = box.right - newRight;
+							var movesLeftTooMuch = newRightDistance > visualMargin;
+
+							if (movesLeftTooMuch) {
+								moveXBy += newRightDistance - visualMargin;
+							}
+						}
+					}
+
+					if (!heightFits) {
+						if (newTop > currentTop) {
+							var newTopDistance = box.top - newTop;
+							var movesDownTooMuch = newTopDistance < -visualMargin;
+
+							if (movesDownTooMuch) {
+								moveYBy += newTopDistance + visualMargin;
+							}
+						}
+
+						if (newBottom < currentBottom) {
+							var newBottomDistance = box.bottom - newBottom;
+							var movesUpTooMuch = newBottomDistance > visualMargin;
+
+							if (movesUpTooMuch) {
+								moveYBy += newBottomDistance - visualMargin;
+							}
+						}
+					}
+
+					console.log({
+						newLeft,
+						newRight,
+						newTop,
+						newBottom
+					});
+
+				 }
 			}
 		}
 
