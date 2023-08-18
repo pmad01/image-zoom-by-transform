@@ -41,19 +41,22 @@ class Zoomy {
 	 */
 	lastMouseY = 0;
 
+	/**
+	 * Options applicable to an instance of the class
+	 * @type {Object}
+	 */
 	options = {
 		boundaryElementId: null,
 		zoomUpperConstraint: null
 	};
 
 	/**
-	 *
 	 * @param elementId
 	 * @param {object} options
 	 */
 	constructor(elementId, options) {
 		this.el = document.getElementById(elementId);
-		this.options = { ...options };
+		this.options = {...options };
 		this.boxEl = this.options.boundaryElementId ? document.getElementById(this.options.boundaryElementId) : document.body;
 		this.options.zoomUpperConstraint ||= 4;
 		var fn = this.handleMouseEvents.bind(this);
@@ -111,16 +114,6 @@ class Zoomy {
 			newRight = currentRight + (currentMouseX - this.lastMouseX),
 			newTop = currentTop + (currentMouseY - this.lastMouseY),
 			newBottom = currentBottom + (currentMouseY - this.lastMouseY);
-			// console.log({
-			// 	currentLeft,
-			// 	newLeft,
-			// 	currentRight,
-			// 	newRight,
-			// 	currentTo[,
-			// 	newTop,
-			// 	currentBottom,
-			// 	newBottom
-			// });
 
 			//flag to check if image can freely be moves on the x-axis(horizontally)
 			var freeX = (
@@ -179,16 +172,8 @@ class Zoomy {
 				newImageCenterYDiff = currentMouseY - imgCenterY;
 
 			enlargeOrShrinkBy = (e.deltaY > 0 ? -zoomFactor : zoomFactor) * currentScale;
-			// enlargeOrShrinkBy = Math.round(enlargeOrShrinkBy * 10) / 10;
 
 			var newScale = currentScale + enlargeOrShrinkBy;
-
-			if (widthFits || widthInsideCanvas) {
-				newImageCenterXDiff = 0;
-			}
-			if (heightFits || heightInsideCanvas) {
-				newImageCenterYDiff = 0;
-			}
 
 			if (
 				newScale > this.options.zoomUpperConstraint || //upper limit
@@ -211,37 +196,21 @@ class Zoomy {
 					var adjustedDiffX = diffX / scaleDiff;
 					var adjustedDiffY = diffY / scaleDiff;
 
-					//I am doing this multiplication to adjust dhe difference based on how much we are shrinking,
-					//so that every shrinkage the transition back to the box center is done smoothly, as it shrinks,
-					//it also goes back synchronously
+					//adjust dhe difference based on how much we are shrinking, so that for every shrinkage the
+					//transition back to the box center is done smoothly, as it shrinks,it also goes back synchronously
 					moveXBy = -adjustedDiffX * enlargeOrShrinkBy;
 					moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
-					//
-					// console.log({
-					// 	imgCenterX,
-					// 	imgCenterY,
-					// 	boxCenterX,
-					// 	boxCenterY,
-					// 	diffX,
-					// 	diffY,
-					// 	scaleDiff,
-					// 	adjustedDiffX,
-					// 	adjustedDiffY,
-					// 	enlargeOrShrinkBy,
-					// 	moveXBy,
-					// 	moveYBy
-					// });
 				}
 			} else {
-				 if (!widthFits && !heightFits) {
-					 //I am doing this to adjust the movement that is applied to the image based on the current scale
-					 adjustedDiffX = newImageCenterXDiff / currentScale;
-					 adjustedDiffY = newImageCenterYDiff / currentScale;
-					 moveXBy = -adjustedDiffX * enlargeOrShrinkBy;
-					 moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
-				 }
+				if (!widthFits && !heightFits) {
+					//ratio of distance to scaling
+					adjustedDiffX = newImageCenterXDiff / currentScale;
+					adjustedDiffY = newImageCenterYDiff / currentScale;
+					moveXBy = -adjustedDiffX * enlargeOrShrinkBy;
+					moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
+				}
 
-				 if (isShrinking) {
+				if (isShrinking) {
 					var newWidth = this.el.offsetWidth * newScale;
 					var widthShrankBy = newWidth - img.width;
 					var oneSideWidthShrankBy = widthShrankBy / 2;
@@ -299,15 +268,7 @@ class Zoomy {
 							}
 						}
 					}
-
-					console.log({
-						newLeft,
-						newRight,
-						newTop,
-						newBottom
-					});
-
-				 }
+				}
 			}
 		}
 
@@ -398,5 +359,4 @@ class Zoomy {
 
 		this.transformByMouseEvent(e);
 	}
-
 }
