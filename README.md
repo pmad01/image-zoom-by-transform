@@ -1,7 +1,7 @@
 # Image Zoom By Transform
 
 Image Zoom and Pan is a lightweight and versatile JavaScript library that allows you to seamlessly incorporate interactive zooming and panning functionality into your web applications.
-With this library, you can provide your users with a good experience when exploring images or other visual content. Version 2 is a Class-Based Approach.
+With this library, you can provide your users with a good experience when exploring images or other visual content.
 
 # Features
 
