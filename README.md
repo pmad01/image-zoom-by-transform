@@ -86,4 +86,4 @@ Zoomy offers additional methods to control its behavior:
 
 # Demo
 
-This is a [Demo](http://htmlpreview.github.io/?https://github.com/pmad01/image-zoom-by-transform/blob/main/demo.html)
+This is a [Demo](https://gitloaf.com/jsdcdn/pmad01/image-zoom-by-transform/main/demo.html)
