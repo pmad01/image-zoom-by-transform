@@ -25,7 +25,6 @@
       resize: both;
     }
   </style>
-  <script src="Zoomy.js"></script>
 </head>
 <body>
 
@@ -35,16 +34,16 @@
         <img class="zoomables" id="zoomy1" src="https://media.istockphoto.com/id/1146517111/photo/taj-mahal-mausoleum-in-agra.jpg?s=612x612&w=0&k=20&c=vcIjhwUrNyjoKbGbAQ5sOcEzDUgOfCsm9ySmJ8gNeRk=" alt="Image 1">
 </div>
 
-<button onclick="zoomy1.enable()">Enable</button>
-<button onclick="zoomy1.disable()">Disable</button>
+<button id="enableButton">Enable</button>
+<button id="disableButton">Disable</button>
 
 <!--<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu libero id neque tincidunt dapibus id at lacus.</p>-->
 
-<!--<div >-->
+<!--<div style="display: flex; align-items: center; justify-content: center;">-->
 <!--    <img class="zoomables" id="zoomy2" src="https://media.istockphoto.com/id/1146517111/photo/taj-mahal-mausoleum-in-agra.jpg?s=612x612&w=0&k=20&c=vcIjhwUrNyjoKbGbAQ5sOcEzDUgOfCsm9ySmJ8gNeRk=" alt="Image 1">-->
-<!--    <button onclick="zoomy2.enable()">Enable</button>-->
-<!--    <button onclick="zoomy2.disable()">Disable</button>-->
 <!--</div>-->
+<!--<button id="enableButton">Enable</button>-->
+<!--<button id="disableButton">Disable</button>-->
 
 <!--<p>Vestibulum id orci eget tellus venenatis bibendum. In hac habitasse platea dictumst.</p>-->
 
@@ -70,10 +69,15 @@
 <!--    <button onclick="zoomy5.disable()">Disable</button>-->
 <!--</div>-->
 
-<script>
-	const zoomy1 = new Zoomy("zoomy1", {boundaryElementId: 'myBoundaryElement'});
+<script type="module">
+    import Zoomy from "./Zoomy.js";
+	const zoomy1 = new Zoomy("zoomy1", {boundaryElementId: "myBoundaryElement"});
+	const enableButton = document.getElementById("enableButton");
+    const disableButton = document.getElementById("disableButton");
+	enableButton.onclick = () => zoomy1.enable();
+	disableButton.onclick = () => zoomy1.disable();
     //
-	// const zoomy2 = new Zoomy("zoomy2", {zoomUpperConstraint: 2});
+	// const zoomy2 = new Zoomy("zoomy2", {zoomUpperConstraint: 4});
     //
 	// const zoomy3 = new Zoomy("zoomy3");
     //

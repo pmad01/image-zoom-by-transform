@@ -354,3 +354,5 @@ class Zoomy {
 		this.transformByMouseEvent(e);
 	}
 }
+
+export default Zoomy;
