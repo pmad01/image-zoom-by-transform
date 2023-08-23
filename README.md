@@ -23,13 +23,13 @@ With this module, you can provide your users with a good experience when explori
 
 Follow these steps to integrate Zoomy into your project:
 
-1\. Include the `Zoomy.js` file in your HTML:
+1\. Include the `Zoomy.min.js` file in your HTML:
 
 ```html
 
 <script type="module">
     
-    import Zoomy from "./Zoomy.js";
+    import Zoomy from "./Zoomy.min.js";
 	//object instantiation and code goes here
 	
 </script>
