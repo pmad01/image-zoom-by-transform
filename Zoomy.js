@@ -1,4 +1,4 @@
-class Zoomy {
+export default class Zoomy {
 	/**
 	 *The HTML element we want to transform
 	 * @type {HTMLElement}
@@ -354,5 +354,3 @@ class Zoomy {
 		this.transformByMouseEvent(e);
 	}
 }
-
-export default Zoomy;
