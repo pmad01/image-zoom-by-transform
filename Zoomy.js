@@ -199,15 +199,25 @@ export default class Zoomy {
 					moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
 				}
 			} else {
-				if (!widthFits && !heightFits) {
+				if (!widthFits || !heightFits) {
 					//ratio of distance to scaling
 					adjustedDiffX = newImageCenterXDiff / currentScale;
 					adjustedDiffY = newImageCenterYDiff / currentScale;
 					moveXBy = -adjustedDiffX * enlargeOrShrinkBy;
 					moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
 				}
-
 				if (isShrinking) {
+					if (widthFits || heightFits) {
+							diffX = imgCenterX - boxCenterX,
+							diffY = imgCenterY - boxCenterY,
+							scaleDiff = 1 - currentScale,
+							//ratio of distance to scaling
+							adjustedDiffX = diffX / scaleDiff,
+							adjustedDiffY = diffY / scaleDiff;
+
+						moveXBy = -adjustedDiffX * enlargeOrShrinkBy;
+						moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
+					}
 					var newWidth = this.el.offsetWidth * newScale,
 					widthShrankBy = newWidth - img.width,
 					oneSideWidthShrankBy = widthShrankBy / 2,
@@ -226,18 +236,19 @@ export default class Zoomy {
 					if (!widthFits) {
 						if (newLeft > currentLeft) {
 							var newLeftDistance = box.left - newLeft,
-								movesRightTooMuch = newLeftDistance < -visualMargin;
+								movesRightTooMuch = newLeftDistance < -visualMargin,
+								leftSideIsVisible = currentLeft >= (box.left + visualMargin);
 
-							if (movesRightTooMuch) {
+							if (movesRightTooMuch && !leftSideIsVisible) {
 								moveXBy += newLeftDistance + visualMargin;
 							}
 						}
 
 						if (newRight < currentRight) {
 							var newRightDistance = box.right - newRight,
-								movesLeftTooMuch = newRightDistance > visualMargin;
-
-							if (movesLeftTooMuch) {
+								movesLeftTooMuch = newRightDistance > visualMargin,
+								rightSideIsVisible = currentRight <= (box.right - visualMargin);
+							if (movesLeftTooMuch && !rightSideIsVisible) {
 								moveXBy += newRightDistance - visualMargin;
 							}
 						}
@@ -246,26 +257,26 @@ export default class Zoomy {
 					if (!heightFits) {
 						if (newTop > currentTop) {
 							var newTopDistance = box.top - newTop,
-								movesDownTooMuch = newTopDistance < -visualMargin;
-
-							if (movesDownTooMuch) {
+								movesDownTooMuch = newTopDistance < -visualMargin,
+								topIsVisible = currentTop >= (box.top + visualMargin);
+							if (movesDownTooMuch && !topIsVisible) {
 								moveYBy += newTopDistance + visualMargin;
 							}
 						}
 
 						if (newBottom < currentBottom) {
 							var newBottomDistance = box.bottom - newBottom,
-								movesUpTooMuch = newBottomDistance > visualMargin;
-
-							if (movesUpTooMuch) {
+								movesUpTooMuch = newBottomDistance > visualMargin,
+								bottomIsVisible = currentBottom <= (box.bottom - visualMargin);
+							if (movesUpTooMuch && !bottomIsVisible) {
 								moveYBy += newBottomDistance - visualMargin;
 							}
 						}
 					}
+					
 				}
 			}
 		}
-
 		this.transform(this.el, moveXBy, moveYBy, enlargeOrShrinkBy);
 		e.preventDefault();
 
