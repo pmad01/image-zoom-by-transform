@@ -86,4 +86,5 @@ Zoomy offers additional methods to control its behavior:
 
 # Demo
 
-This is a [Demo](https://gitloaf.com/jsdcdn/pmad01/image-zoom-by-transform/main/demo.html)
+This is a [Demo](https://gitloaf.com/jsdcdn/pmad01/image-zoom-by-transform/main/demo.html) with a boundary element.
+This is a [Demo](https://gitloaf.com/jsdcdn/pmad01/image-zoom-by-transform/main/demo2.html) without a boundary element.

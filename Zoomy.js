@@ -182,51 +182,36 @@ export default class Zoomy {
 			) {
 				enlargeOrShrinkBy = 0;
 			}
+			if (ElContainsTarget && (!widthFits || !heightFits)) {
+				//ratio of distance to scaling
+				var adjustedDiffX = newImageCenterXDiff / currentScale,
+					adjustedDiffY = newImageCenterYDiff / currentScale;
 
-			if (!ElContainsTarget) {
-				if (isShrinking) {
-					//get distance between image's center and the center of the box
+				moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
+				moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
+			}
+			if (isShrinking) {
+				if ((ElContainsTarget && (widthFits || heightFits)) || !ElContainsTarget) {
 					var diffX = imgCenterX - boxCenterX,
 						diffY = imgCenterY - boxCenterY,
-						scaleDiff = 1 - currentScale,
-						//ratio of distance to scaling
-					    adjustedDiffX = diffX / scaleDiff,
-						adjustedDiffY = diffY / scaleDiff;
+						scaleDiff = 1 - currentScale;
 
-					//adjust dhe difference based on how much we are shrinking, so that for every shrinkage the
-					//transition back to the box center is done smoothly, as it shrinks,it also goes back synchronously
-					moveXBy = -adjustedDiffX * enlargeOrShrinkBy;
-					moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
-				}
-			} else {
-				if (!widthFits || !heightFits) {
 					//ratio of distance to scaling
-					adjustedDiffX = newImageCenterXDiff / currentScale;
-					adjustedDiffY = newImageCenterYDiff / currentScale;
-					moveXBy = -adjustedDiffX * enlargeOrShrinkBy;
+					adjustedDiffX = diffX / scaleDiff,
+					adjustedDiffY = diffY / scaleDiff,
+					moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
 					moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
 				}
-				if (isShrinking) {
-					if (widthFits || heightFits) {
-							diffX = imgCenterX - boxCenterX,
-							diffY = imgCenterY - boxCenterY,
-							scaleDiff = 1 - currentScale,
-							//ratio of distance to scaling
-							adjustedDiffX = diffX / scaleDiff,
-							adjustedDiffY = diffY / scaleDiff;
-
-						moveXBy = -adjustedDiffX * enlargeOrShrinkBy;
-						moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
-					}
+				if (ElContainsTarget) {
 					var newWidth = this.el.offsetWidth * newScale,
-					widthShrankBy = newWidth - img.width,
-					oneSideWidthShrankBy = widthShrankBy / 2,
-					newHeight = this.el.offsetHeight * newScale,
-					heightShrankBy = newHeight - img.height,
-					oneSideHeightShrankBy = heightShrankBy / 2,
-					horizontalMove = moveXBy - oneSideWidthShrankBy,
-					verticalMove = moveYBy - oneSideHeightShrankBy,
-					visualMargin = 10;
+						widthShrankBy = newWidth - img.width,
+						oneSideWidthShrankBy = widthShrankBy / 2,
+						newHeight = this.el.offsetHeight * newScale,
+						heightShrankBy = newHeight - img.height,
+						oneSideHeightShrankBy = heightShrankBy / 2,
+						horizontalMove = moveXBy - oneSideWidthShrankBy,
+						verticalMove = moveYBy - oneSideHeightShrankBy,
+						visualMargin = 10;
 
 					newLeft = currentLeft + horizontalMove;
 					newRight = newLeft + newWidth;
@@ -273,7 +258,6 @@ export default class Zoomy {
 							}
 						}
 					}
-					
 				}
 			}
 		}
@@ -361,7 +345,6 @@ export default class Zoomy {
 		if(!this.enabled){
 			return false;
 		}
-
 		this.transformByMouseEvent(e);
 	}
 }

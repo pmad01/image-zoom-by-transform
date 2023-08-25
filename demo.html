@@ -33,7 +33,6 @@
 <div id="myBoundaryElement" resizable="true">
         <img class="zoomables" id="zoomy1" src="https://media.istockphoto.com/id/1146517111/photo/taj-mahal-mausoleum-in-agra.jpg?s=612x612&w=0&k=20&c=vcIjhwUrNyjoKbGbAQ5sOcEzDUgOfCsm9ySmJ8gNeRk=" alt="Image 1">
 </div>
-
 <button id="enableButton">Enable</button>
 <button id="disableButton">Disable</button>
 <button id="image1">Image 1</button>
@@ -42,22 +41,9 @@
 
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu libero id neque tincidunt dapibus id at lacus.</p>
 
-<!--<div style="display: flex; align-items: center; justify-content: center;">-->
-<!--    <img class="zoomables" id="zoomy2" src="https://media.istockphoto.com/id/1146517111/photo/taj-mahal-mausoleum-in-agra.jpg?s=612x612&w=0&k=20&c=vcIjhwUrNyjoKbGbAQ5sOcEzDUgOfCsm9ySmJ8gNeRk=" alt="Image 1">-->
-<!--</div>-->
-<!--<button id="enableButton">Enable</button>-->
-<!--<button id="disableButton">Disable</button>-->
-<!--<button id="image1">Image 1</button>-->
-<!--<button id="image2">Image 2</button>-->
-<!--<button id="image3">Image 3</button>-->
-
-<!--<p>Vestibulum id orci eget tellus venenatis bibendum. In hac habitasse platea dictumst.</p>-->
-
-
 <script type="module">
     import Zoomy from "./Zoomy.min.js";
 	const zoomy1 = new Zoomy("zoomy1", {boundaryElementId: "myBoundaryElement"});
-    // const zoomy2 = new Zoomy("zoomy2", {zoomUpperConstraint: 4});
 	const enableButton = document.getElementById("enableButton");
 	const disableButton = document.getElementById("disableButton");
 	const image1 = document.getElementById("image1");
@@ -68,9 +54,6 @@
     image1.onclick = () => document.getElementById("zoomy1").src = 'https://media.istockphoto.com/id/1146517111/photo/taj-mahal-mausoleum-in-agra.jpg?s=612x612&w=0&k=20&c=vcIjhwUrNyjoKbGbAQ5sOcEzDUgOfCsm9ySmJ8gNeRk=';
 	image2.onclick = () => document.getElementById("zoomy1").src = 'https://media1.popsugar-assets.com/files/thumbor/csZRC2qeo9ZLEOQm4Aga1PqEGJI=/3342x5013/filters:format_auto():quality(85):extract_cover()/2019/09/11/836/n/46371222/tmp_8FXQEV_da011c25485043e7_GettyImages-1169836724.jpg';
     image3.onclick = () => document.getElementById("zoomy1").src = 'https://photos.smugmug.com/photos/i-dL4PGJS/0/L/i-dL4PGJS-L.jpg';
-
-
-
 </script>
 </body>
 </html>
