@@ -1,48 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <style>
-        body {
-            user-select: none;
-            -moz-user-select: none;
-        }
-        .zoomables {
-            border: 1px solid black;
-            width: 50%;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+    body {
+      user-select: none;
+     -moz-user-select: none;
+      text-align:center;
+    }
+    .zoomables {
+      border: 1px solid black;
+      width: 20%;
+    }
+    div {
+        display: inline-block;
+        width: 500px;
+        vertical-align: top;
+    }
+  </style>
 </head>
 <body>
 
-<h1>Zoomy Test Page 2</h1>
+<h1>Life with Sports</h1>
 
-<div style="display: flex; align-items: center; justify-content: center;">
-    <img class="zoomables" id="zoomy2" src="https://media.istockphoto.com/id/1146517111/photo/taj-mahal-mausoleum-in-agra.jpg?s=612x612&w=0&k=20&c=vcIjhwUrNyjoKbGbAQ5sOcEzDUgOfCsm9ySmJ8gNeRk=" alt="Image 1">
+<div >
+    Chaos in the first half, chaos in the second half. Chaos in the Liverpool defence and chaos in the Newcastle defence. Chaos in Trent Alexander-Arnold’s mind, in Virgil van Dijk’s mind, perhaps in the referee’s mind. Chaos so thoroughly chaotic that it rendered the most chaotic Premier League player of all into a clanking totem of clinically icy finishing. Football is a sport we try to rationalise. We try to explain it with data and diagrams. We try to reduce the random by having referees’ decisions checked in slow motion and by endlessly rewriting the laws. But sometimes the random just bubbles over. Sometimes the chaos cannot be contained. And that is what, despite the dirty money and the dirtier money, despite the public investment funds and the private equity, despite the conspiracy theorists and tribal bores, makes football still worth it.
 </div>
-<button id="enableButton">Enable</button>
-<button id="disableButton">Disable</button>
-<button id="image1">Image 1</button>
-<button id="image2">Image 2</button>
-<button id="image3">Image 3</button>
+<img class="zoomables" src="https://i.guim.co.uk/img/media/b1bdc82f3d2150376f21fd666aec6d8aa082b0db/207_337_5484_3290/master/5484.jpg?width=620&dpr=2&s=none" alt="nunez-img">
+<br>
+<br>
+<br>
+<img class="zoomables" src="https://i.guim.co.uk/img/media/c67942c4832d6a50f1f90bb61da89aa62772154c/0_20_3000_1800/master/3000.jpg?width=620&dpr=2&s=none" alt="">
+<div>
+    They lost again. They improved again. They fired some shots but often into their own feet. They dominated possession but didn’t convert it to points. They created lots of chances but squandered plenty of opportunities. They were mostly brave and occasionally stupid. Again. Australia’s 41-17 loss to France piles more pressure on a side already labouring under a 0-5 start to the season. But the coach maintains this latest pummelling doesn’t mean much in the grander scheme of the Wallabies’ World Cup campaign starting on 10 September. Defeat, Eddie Jones says, isn’t another nail in the coffin, it’s another rung up the ladder.
+</div>
+<br>
+<br>
+<br>
 
-<p>Vestibulum id orci eget tellus venenatis bibendum. In hac habitasse platea dictumst.</p>
+<div style="text-align: center ">
+    Happy birthday!” “Thanks!” Suddenly all I can see is the ceiling, and flashes of blurred movement. Is that wrapping paper? “Thanks mum!” “You’re welcome!” I have no idea what my 10-year-old son is thanking me for. Tournament football can be tough. Is it worth it? Is seven weeks away from your kid really worth it? How many birthdays can I miss?
+    No matter the joy, the adrenaline, the rush, the guilt over feeling guilty when you’re doing a job you love and that others would give up a limb for, those questions still hit you. Regularly. In many ways, doing the job I do allows me to spend time with my kid in ways that those working nine to five can’t. I’m here, I’m there, from matches to training grounds, but I’m able to help do the school runs, to be present day-to-day, but the tournaments take an emotional and physical toll. It is long days, late nights, thousands of words, mistimed video calls home, unhealthy eating, lots of travel, late-night podcast records, tempered only by the football, the players and the camaraderie between journalists.
+    <img class="zoomables" style="width: 70%; height: 40%"src="https://upload.wikimedia.org/wikipedia/en/thumb/2/24/Logo_of_the_2023_FIFA_Women%27s_World_Cup.svg/1200px-Logo_of_the_2023_FIFA_Women%27s_World_Cup.svg.png" alt="">
+</div>
+<br>
+<br>
+<br>
 
+<div>
+    As the AFL was reminded again last weekend, to its significant chagrin, there is no such thing as a certainty in sport after a round that damaged reputations and decimated finals hopes. Not only did a goal review farce sink Adelaide and further dent the battered commodity known as the integrity of the competition, a string of shock results in the penultimate round has largely robbed the AFL of a fairytale lead-in to the finals series.
+    The suspense is not completely killed off as flag contenders jostle for position but the final round of the season is not the blockbuster envisaged earlier this month. Both the competition and broadcasters will be hoping the Western Bulldogs can rediscover their bark and bite against Geelong on Saturday to set the scene for a Sunday night special. A Bulldogs triumph would see them draw level on points with the eighth-placed Giants, which would then need to defeat Carlton at Marvel Stadium on Sunday night to qualify.
+</div>
+<img class="zoomables" src="https://i.guim.co.uk/img/media/23b10cfb9a0a1ca8f6a101580cc52f658c463038/350_0_3034_1822/master/3034.jpg?width=620&dpr=2&s=none" alt="">
 
 <script type="module">
-	import Zoomy from "./Zoomy.min.js";
-	const zoomy2 = new Zoomy("zoomy2", {zoomUpperConstraint: 5});
-	const enableButton = document.getElementById("enableButton");
-	const disableButton = document.getElementById("disableButton");
-	const image1 = document.getElementById("image1");
-	const image2 = document.getElementById("image2");
-	const image3 = document.getElementById("image3");
-	enableButton.onclick = () => zoomy2.enable();
-	disableButton.onclick = () => zoomy2.disable();
-	image1.onclick = () => document.getElementById("zoomy2").src = 'https://media.istockphoto.com/id/1146517111/photo/taj-mahal-mausoleum-in-agra.jpg?s=612x612&w=0&k=20&c=vcIjhwUrNyjoKbGbAQ5sOcEzDUgOfCsm9ySmJ8gNeRk=';
-	image2.onclick = () => document.getElementById("zoomy2").src = 'https://media1.popsugar-assets.com/files/thumbor/csZRC2qeo9ZLEOQm4Aga1PqEGJI=/3342x5013/filters:format_auto():quality(85):extract_cover()/2019/09/11/836/n/46371222/tmp_8FXQEV_da011c25485043e7_GettyImages-1169836724.jpg';
-	image3.onclick = () => document.getElementById("zoomy2").src = 'https://photos.smugmug.com/photos/i-dL4PGJS/0/L/i-dL4PGJS-L.jpg';
+    import Zoomy from "./Zoomy.min.js";
+    // new Zoomy("zoomy1");
 </script>
 </body>
 </html>

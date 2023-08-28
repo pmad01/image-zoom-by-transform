@@ -2,10 +2,32 @@
   <library name="Generated files" type="javaScript">
     <properties>
       <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/Demo 2/assets/js/custom.min.js" />
+        <item url="file://$PROJECT_DIR$/Demo 2/assets/js/isotope.min.js" />
+        <item url="file://$PROJECT_DIR$/Demo 2/assets/js/isotope.min.min.js" />
+        <item url="file://$PROJECT_DIR$/Demo 2/assets/js/owl-carousel.min.js" />
+        <item url="file://$PROJECT_DIR$/Demo 2/assets/js/popup.min.js" />
+        <item url="file://$PROJECT_DIR$/Demo 2/assets/js/tabs.min.js" />
+        <item url="file://$PROJECT_DIR$/Demo 2/vendor/bootstrap/js/bootstrap.min.min.js" />
+        <item url="file://$PROJECT_DIR$/Demo 2/vendor/jquery/jquery.min.js" />
+        <item url="file://$PROJECT_DIR$/Demo 2/vendor/jquery/jquery.min.min.js" />
+        <item url="file://$PROJECT_DIR$/Demo 2/vendor/jquery/jquery.slim.min.js" />
+        <item url="file://$PROJECT_DIR$/Demo 2/vendor/jquery/jquery.slim.min.min.js" />
         <item url="file://$PROJECT_DIR$/Zoomy.min.js" />
       </sourceFilesUrls>
     </properties>
     <CLASSES>
+      <root url="file://$PROJECT_DIR$/Demo 2/assets/js/custom.min.js" />
+      <root url="file://$PROJECT_DIR$/Demo 2/assets/js/isotope.min.js" />
+      <root url="file://$PROJECT_DIR$/Demo 2/assets/js/isotope.min.min.js" />
+      <root url="file://$PROJECT_DIR$/Demo 2/assets/js/owl-carousel.min.js" />
+      <root url="file://$PROJECT_DIR$/Demo 2/assets/js/popup.min.js" />
+      <root url="file://$PROJECT_DIR$/Demo 2/assets/js/tabs.min.js" />
+      <root url="file://$PROJECT_DIR$/Demo 2/vendor/bootstrap/js/bootstrap.min.min.js" />
+      <root url="file://$PROJECT_DIR$/Demo 2/vendor/jquery/jquery.min.js" />
+      <root url="file://$PROJECT_DIR$/Demo 2/vendor/jquery/jquery.min.min.js" />
+      <root url="file://$PROJECT_DIR$/Demo 2/vendor/jquery/jquery.slim.min.js" />
+      <root url="file://$PROJECT_DIR$/Demo 2/vendor/jquery/jquery.slim.min.min.js" />
       <root url="file://$PROJECT_DIR$/Zoomy.min.js" />
     </CLASSES>
     <JAVADOC />
