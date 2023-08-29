@@ -57,13 +57,16 @@ export default class Zoomy {
 	constructor(elementId, options) {
 		this.el = document.getElementById(elementId);
 		this.options = {...options };
-		this.boxEl = this.options.boundaryElementId ? document.getElementById(this.options.boundaryElementId) : document.body;
+		this.boxEl = this.options.boundaryElementId ? document.getElementById(this.options.boundaryElementId) : null;
 		this.options.zoomUpperConstraint ||= 4;
 		var fn = this.handleMouseEvents.bind(this);
 		if (this.boxEl) {
 			this.boxEl.addEventListener('wheel', fn, {passive: false});
 		} else {
 			this.el.addEventListener('wheel', fn, {passive: false});
+			this.el.addEventListener('mouseout', function () {
+				this.style.transform = 'matrix(1, 0, 0, 1, 0, 0)';
+			})
 		}
 
 		this.el.addEventListener('mousedown', fn, {passive: false});
@@ -84,9 +87,35 @@ export default class Zoomy {
 			currentMouseY = e.y,
 			moveXBy = 0,
 			moveYBy = 0,
-			img = this.el.getBoundingClientRect(),
-			box = this.boxEl.getBoundingClientRect(),
-			widthFits = img.width <= box.width,
+			img = this.el.getBoundingClientRect();
+
+			var box =  () => {
+				if (this.boxEl) {
+					return this.boxEl.getBoundingClientRect();
+				} else {
+					return {
+						width: window.innerWidth,
+						height: window.innerHeight,
+						left: window.screenLeft,
+						top: window.screenTop,
+						right: window.innerWidth,
+						bottom: window.innerHeight
+					}
+				}
+			};
+			box = box();
+
+		// console.log({
+		// 	window,
+		// 	windowLeft: window.screenLeft
+		// })
+
+		// console.log({
+		// 	width: box.width,
+		// 	height: box.height
+		// });
+
+		var widthFits = img.width <= box.width,
 			heightFits = img.height <= box.height,
 			currentLeft = img.left,
 			currentRight = img.right,
@@ -182,19 +211,21 @@ export default class Zoomy {
 			) {
 				enlargeOrShrinkBy = 0;
 			}
+
 			if (ElContainsTarget && (!widthFits || !heightFits)) {
 				//ratio of distance to scaling
 				var adjustedDiffX = newImageCenterXDiff / currentScale,
 					adjustedDiffY = newImageCenterYDiff / currentScale;
 
-				moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
-				moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
+					moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
+					moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
 			}
 			if (isShrinking) {
 				if ((ElContainsTarget && (widthFits || heightFits)) || !ElContainsTarget) {
 					var diffX = imgCenterX - boxCenterX,
 						diffY = imgCenterY - boxCenterY,
 						scaleDiff = 1 - currentScale;
+					// console.log(imgCenterX, imgCenterY)
 
 					//ratio of distance to scaling
 					adjustedDiffX = diffX / scaleDiff,
@@ -260,6 +291,34 @@ export default class Zoomy {
 					}
 				}
 			}
+			if (!this.boxEl) {
+				if (!isShrinking) {
+					if (widthFits && heightFits) {
+						diffX = imgCenterX - boxCenterX,
+						diffY = imgCenterY - boxCenterY,
+
+						adjustedDiffX = diffX / (enlargeOrShrinkBy + 1),
+						adjustedDiffY = diffY / (enlargeOrShrinkBy + 1);
+
+						moveXBy = -adjustedDiffX * (enlargeOrShrinkBy + zoomFactor),
+						moveYBy = -adjustedDiffY * (enlargeOrShrinkBy + zoomFactor);
+					}
+				} else {
+					if (widthFits || heightFits) {
+						var originalImageX = this.el.offsetLeft + this.el.offsetWidth / 2;
+						var originalImageY = this.el.offsetTop + this.el.offsetHeight / 2;
+						diffX = imgCenterX - originalImageX + window.scrollX,
+						diffY = imgCenterY - originalImageY + window.scrollY,
+						scaleDiff = 1 - currentScale;
+
+						//ratio of distance to scaling
+						adjustedDiffX = diffX / scaleDiff,
+						adjustedDiffY = diffY / scaleDiff,
+						moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
+						moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
+					}
+				}
+			}
 		}
 		this.transform(this.el, moveXBy, moveYBy, enlargeOrShrinkBy);
 		e.preventDefault();
@@ -314,6 +373,7 @@ export default class Zoomy {
 			this.boxEl.removeEventListener('wheel', this.handleMouseEvents);
 		} else {
 			this.el.removeEventListener('wheel', this.handleMouseEvents);
+			this.el.removeEventListener('mouseout', this.handleMouseEvents);
 		}
 		this.el.removeEventListener('mousedown', this.handleMouseEvents);
 
