@@ -94,11 +94,11 @@ export default class Zoomy {
 			moveYBy = 0,
 			img = this.el.getBoundingClientRect();
 
-			var box =  () => {
+
 				if (this.boxEl) {
-					return this.boxEl.getBoundingClientRect();
+					var box = this.boxEl.getBoundingClientRect();
 				} else {
-					return {
+					box = {
 						width: window.innerWidth,
 						height: window.innerHeight,
 						left: window.screenLeft,
@@ -107,8 +107,7 @@ export default class Zoomy {
 						bottom: window.innerHeight
 					}
 				}
-			};
-			box = box();
+
 
 		// console.log({
 		// 	window,
@@ -200,11 +199,14 @@ export default class Zoomy {
 				boxCenterY = box.top + (box.height / 2),
 				newImageCenterXDiff = currentMouseX - imgCenterX,
 				newImageCenterYDiff = currentMouseY - imgCenterY,
-				ElContainsTarget = this.el.contains(e.target),
+				inImageZoom = this.el.contains(e.target),
 				isShrinking = e.deltaY > 0,
 				enlargeOrShrinkBy = 0,
 				zoomFactor = .1,
-				currentScale = img.width / this.el.offsetWidth;
+				currentScale = img.width / this.el.offsetWidth,
+				widthAndHeightFit = widthFits && heightFits,
+				widthOrHeightFits = widthFits || heightFits;
+
 
 			enlargeOrShrinkBy = (e.deltaY > 0 ? -zoomFactor : zoomFactor) * currentScale;
 
@@ -217,28 +219,28 @@ export default class Zoomy {
 				enlargeOrShrinkBy = 0;
 			}
 
-			if (ElContainsTarget && (!widthFits || !heightFits)) {
-				//ratio of distance to scaling
-				var adjustedDiffX = newImageCenterXDiff / currentScale,
-					adjustedDiffY = newImageCenterYDiff / currentScale;
+			if (inImageZoom) {
+				if (!widthAndHeightFit) {
+					//ratio of distance to scaling
+					var adjustedDiffX = newImageCenterXDiff / currentScale,
+						adjustedDiffY = newImageCenterYDiff / currentScale;
 
-					moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
-					moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
-			}
-			if (isShrinking) {
-				if ((ElContainsTarget && (widthFits || heightFits)) || !ElContainsTarget) {
-					var diffX = imgCenterX - boxCenterX,
+						moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
+						moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
+				}
+				if (isShrinking) {
+					if (widthOrHeightFits) {
+						diffX = imgCenterX - boxCenterX,
 						diffY = imgCenterY - boxCenterY,
 						scaleDiff = 1 - currentScale;
-					// console.log(imgCenterX, imgCenterY)
+						// console.log(imgCenterX, imgCenterY)
 
-					//ratio of distance to scaling
-					adjustedDiffX = diffX / scaleDiff,
-					adjustedDiffY = diffY / scaleDiff,
-					moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
-					moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
-				}
-				if (ElContainsTarget) {
+						//ratio of distance to scaling
+						adjustedDiffX = diffX / scaleDiff,
+						adjustedDiffY = diffY / scaleDiff,
+						moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
+						moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
+					}
 					var newWidth = this.el.offsetWidth * newScale,
 						widthShrankBy = newWidth - img.width,
 						oneSideWidthShrankBy = widthShrankBy / 2,
@@ -249,10 +251,10 @@ export default class Zoomy {
 						verticalMove = moveYBy - oneSideHeightShrankBy,
 						visualMargin = 10;
 
-					newLeft = currentLeft + horizontalMove;
-					newRight = newLeft + newWidth;
-					newTop = currentTop + verticalMove;
-					newBottom = newTop + newHeight;
+						newLeft = currentLeft + horizontalMove;
+						newRight = newLeft + newWidth;
+						newTop = currentTop + verticalMove;
+						newBottom = newTop + newHeight;
 
 					if (!widthFits) {
 						if (newLeft > currentLeft) {
@@ -295,10 +297,24 @@ export default class Zoomy {
 						}
 					}
 				}
+			} else {
+				if (isShrinking) {
+				var diffX = imgCenterX - boxCenterX,
+					diffY = imgCenterY - boxCenterY,
+					scaleDiff = 1 - currentScale;
+					// console.log(imgCenterX, imgCenterY)
+
+					//ratio of distance to scaling
+					adjustedDiffX = diffX / scaleDiff,
+					adjustedDiffY = diffY / scaleDiff,
+					moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
+					moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
+				}
 			}
+
 			if (!this.boxEl) {
 				if (!isShrinking) {
-					if (widthFits && heightFits) {
+					if (widthAndHeightFit) {
 						diffX = imgCenterX - boxCenterX,
 						diffY = imgCenterY - boxCenterY,
 
@@ -309,7 +325,7 @@ export default class Zoomy {
 						moveYBy = -adjustedDiffY * (enlargeOrShrinkBy + zoomFactor);
 					}
 				} else {
-					if (widthFits || heightFits) {
+					if (widthOrHeightFits) {
 						var originalImageX = this.el.offsetLeft + this.el.offsetWidth / 2;
 						var originalImageY = this.el.offsetTop + this.el.offsetHeight / 2;
 						diffX = imgCenterX - originalImageX + window.scrollX,
