@@ -13,6 +13,7 @@
       border: 1px solid black;
       width: 50%;
       margin: 0px 10px;
+      position: relative;
     }
     div {
         display: inline-block;
@@ -40,7 +41,7 @@
 <br>
 <div>
     <h2>Wallabies</h2>
-    <img id="zoomy2" style="float: left" class="zoomables" src="https://i.guim.co.uk/img/media/c67942c4832d6a50f1f90bb61da89aa62772154c/0_20_3000_1800/master/3000.jpg?width=620&dpr=2&s=none" alt=""/>
+    <img id="zoomy2" style="float: left;" class="zoomables" src="https://i.guim.co.uk/img/media/c67942c4832d6a50f1f90bb61da89aa62772154c/0_20_3000_1800/master/3000.jpg?width=620&dpr=2&s=none" alt=""/>
     <p>
         They lost again. They improved again. They fired some shots but often into their own feet. They dominated possession but didn’t convert it to points. They created lots of chances but squandered plenty of opportunities. They were mostly brave and occasionally stupid. Again. Australia’s 41-17 loss to France piles more pressure on a side already labouring under a 0-5 start to the season. But the coach maintains this latest pummelling doesn’t mean much in the grander scheme of the Wallabies’ World Cup campaign starting on 10 September. Defeat, Eddie Jones says, isn’t another nail in the coffin, it’s another rung up the ladder.
         “The scoreboard is always important, but we’ve got a greater aim than this game,” Jones said after the defeat. “In terms of what we want to do for the World Cup, we probably did a lot of good things. But we’ve got to get better at converting territory to points and when they get in our territory, stopping them scoring points. We’re not a bad team but we’re not a good team yet.”
@@ -50,7 +51,7 @@
 <br>
 <div>
     <h2>Women World Cup</h2>
-    <img id="zoomy3" style="float: right" class="zoomables" src="https://upload.wikimedia.org/wikipedia/en/thumb/2/24/Logo_of_the_2023_FIFA_Women%27s_World_Cup.svg/1200px-Logo_of_the_2023_FIFA_Women%27s_World_Cup.svg.png" alt=""/>
+    <img id="zoomy3" style="float: right;" class="zoomables" src="https://upload.wikimedia.org/wikipedia/en/thumb/2/24/Logo_of_the_2023_FIFA_Women%27s_World_Cup.svg/1200px-Logo_of_the_2023_FIFA_Women%27s_World_Cup.svg.png" alt=""/>
     <p>
         Happy birthday!” “Thanks!” Suddenly all I can see is the ceiling, and flashes of blurred movement. Is that wrapping paper? “Thanks mum!” “You’re welcome!” I have no idea what my 10-year-old son is thanking me for. Tournament football can be tough. Is it worth it? Is seven weeks away from your kid really worth it? How many birthdays can I miss?
         No matter the joy, the adrenaline, the rush, the guilt over feeling guilty when you’re doing a job you love and that others would give up a limb for, those questions still hit you. Regularly. In many ways, doing the job I do allows me to spend time with my kid in ways that those working nine to five can’t. I’m here, I’m there, from matches to training grounds, but I’m able to help do the school runs, to be present day-to-day, but the tournaments take an emotional and physical toll. It is long days, late nights, thousands of words, mistimed video calls home, unhealthy eating, lots of travel, late-night podcast records, tempered only by the football, the players and the camaraderie between journalists.
@@ -62,7 +63,7 @@
 <br>
 <div>
     <h2>AFL</h2>
-    <img id="zoomy4" style="float: right" class="zoomables" src="https://www.bluemountainsgazette.com.au/images/transform/v1/crop/frm/silverstone-feed-data/abb70df7-b6fd-47a1-90a5-74f82c9d0649.jpg/r0_0_800_600_w800_h600_fmax.jpg" alt="">
+    <img id="zoomy4" style="float: left;" class="zoomables" src="https://www.bluemountainsgazette.com.au/images/transform/v1/crop/frm/silverstone-feed-data/abb70df7-b6fd-47a1-90a5-74f82c9d0649.jpg/r0_0_800_600_w800_h600_fmax.jpg" alt="">
     <p>
     As the AFL was reminded again last weekend, to its significant chagrin, there is no such thing as a certainty in sport after a round that damaged reputations and decimated finals hopes. Not only did a goal review farce sink Adelaide and further dent the battered commodity known as the integrity of the competition, a string of shock results in the penultimate round has largely robbed the AFL of a fairytale lead-in to the finals series.
     The suspense is not completely killed off as flag contenders jostle for position but the final round of the season is not the blockbuster envisaged earlier this month. Both the competition and broadcasters will be hoping the Western Bulldogs can rediscover their bark and bite against Geelong on Saturday to set the scene for a Sunday night special. A Bulldogs triumph would see them draw level on points with the eighth-placed Giants, which would then need to defeat Carlton at Marvel Stadium on Sunday night to qualify.
@@ -80,12 +81,13 @@
 	const zoomy4 = new Zoomy('zoomy4');
 
 
-	//alternative
+
+	// alternative
     // const zoomables = document.getElementsByClassName("zoomables");
 	// [...zoomables].forEach(zoomable => {
 	// 	zoomable.addEventListener("mouseover", function () {
 	// 		const zoomyId = zoomable.id;
-	// 		const zoomy = new Zoomy(`${zoomyId}`);
+	// 		const zoomy = new Zoomy(`${zoomyId}`, {zoomUpperConstraint: 9});
 	// 	});
     // })
 

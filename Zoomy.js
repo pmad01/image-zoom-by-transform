@@ -66,8 +66,13 @@ export default class Zoomy {
 			this.el.addEventListener('wheel', fn, {passive: false});
 			this.el.addEventListener('mouseout', function () {
 				this.style.transform = 'matrix(1, 0, 0, 1, 0, 0)';
-			})
+				this.style.zIndex -= 1;
+			});
 		}
+
+		this.el.addEventListener('mouseover', function () {
+			this.style.zIndex += 1;
+		})
 
 		this.el.addEventListener('mousedown', fn, {passive: false});
 
@@ -376,6 +381,7 @@ export default class Zoomy {
 			this.el.removeEventListener('mouseout', this.handleMouseEvents);
 		}
 		this.el.removeEventListener('mousedown', this.handleMouseEvents);
+		this.el.removeEventListener('mouseover', this.handleMouseEvents);
 
 		['mousemove', 'mouseup', 'mouseout'].forEach(
 			event => document.removeEventListener(event, this.handleMouseEvents)
