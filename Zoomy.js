@@ -56,7 +56,6 @@ export default class Zoomy {
 	 */
 	originalZIndex;
 
-
 	/**
 	 * @param elementId
 	 * @param {object} options
@@ -77,14 +76,16 @@ export default class Zoomy {
 				this.el.style.zIndex = '999999';
 				fn(e);
 			} , {passive: false});
-
-			this.el.addEventListener('mouseout',  () => {
-				this.el.style.transform = 'matrix(1, 0, 0, 1, 0, 0)';
-				this.el.style.zIndex = this.originalZIndex;
-			});
 		}
 
 		this.el.addEventListener('mousedown', fn, {passive: false});
+
+		this.el.addEventListener('mouseout',  () => {
+			if (!this.isDragging) {
+				this.el.style.transform = 'matrix(1, 0, 0, 1, 0, 0)';
+				this.el.style.zIndex = this.originalZIndex;
+			}
+		});
 
 		['mousemove', 'mouseup', 'mouseout'].forEach(
 			event => {
@@ -105,7 +106,6 @@ export default class Zoomy {
 			img = this.el.getBoundingClientRect(),
 			box;
 
-
 		if (this.boxEl) {
 			box = this.boxEl.getBoundingClientRect();
 		} else {
@@ -119,18 +119,8 @@ export default class Zoomy {
 			}
 		}
 
-		// console.log({
-		// 	window,
-		// 	windowLeft: window.screenLeft
-		// })
-
-		// console.log({
-		// 	width: box.width,
-		// 	height: box.height
-		// });
-
-		var widthFits = img.width <= box.width,
-			heightFits = img.height <= box.height,
+		var widthFits = img.width < box.width,
+			heightFits = img.height < box.height,
 			currentLeft = img.left,
 			currentRight = img.right,
 			currentTop = img.top,
@@ -179,7 +169,8 @@ export default class Zoomy {
 			var freeY = (
 				img.height > box.height || // image bigger than canvas
 				!heightInsideCanvas // or image outside of canvas
-			) && !(
+			) &&
+			!(
 				(newTop < box.top && //hard ceiling
 					(
 						newTop <= currentTop && //if going up
@@ -223,11 +214,11 @@ export default class Zoomy {
 				newWidth = this.el.offsetWidth * newScale,
 				newHeight = this.el.offsetHeight * newScale;
 
-			if (
-				newScale > this.options.zoomUpperConstraint || //upper limit
-				newScale < .9 //lower limit
-			) {
+			if (newScale > this.options.zoomUpperConstraint) {
 				enlargeOrShrinkBy = 0;
+			}
+			else if (newScale < 1) {
+				enlargeOrShrinkBy = 1-currentScale; //lower limit
 			}
 
 			if (zoomInImage) {
@@ -258,7 +249,7 @@ export default class Zoomy {
 						oneSideHeightShrankBy = heightShrankBy / 2,
 						horizontalMove = moveXBy - oneSideWidthShrankBy,
 						verticalMove = moveYBy - oneSideHeightShrankBy,
-						visualMargin = 10;
+						visualMargin = 0;
 
 						newLeft = currentLeft + horizontalMove;
 						newRight = newLeft + newWidth;
@@ -269,17 +260,26 @@ export default class Zoomy {
 						if (newLeft > currentLeft) {
 							var newLeftDistance = box.left - newLeft,
 								movesRightTooMuch = newLeftDistance < -visualMargin,
-								leftSideIsVisible = currentLeft >= (box.left + visualMargin);
+								leftSideIsVisible = currentLeft > (box.left + visualMargin + 1);
 
 							if (movesRightTooMuch && !leftSideIsVisible) {
 								moveXBy += newLeftDistance + visualMargin;
 							}
+							// console.log({
+							// 	newLeftDistance,
+							// 	currentLeft,
+							// 	boxLeft: box.left,
+							// 	visualMargin,
+							// 	movesRightTooMuch,
+							// 	leftSideIsVisible,
+							// 	moveXBy
+							// })
 						}
 
 						if (newRight < currentRight) {
 							var newRightDistance = box.right - newRight,
 								movesLeftTooMuch = newRightDistance > visualMargin,
-								rightSideIsVisible = currentRight <= (box.right - visualMargin);
+								rightSideIsVisible = currentRight < (box.right - visualMargin - 6);
 							if (movesLeftTooMuch && !rightSideIsVisible) {
 								moveXBy += newRightDistance - visualMargin;
 							}
@@ -290,7 +290,7 @@ export default class Zoomy {
 						if (newTop > currentTop) {
 							var newTopDistance = box.top - newTop,
 								movesDownTooMuch = newTopDistance < -visualMargin,
-								topIsVisible = currentTop >= (box.top + visualMargin);
+								topIsVisible = currentTop > (box.top + visualMargin + 1);
 							if (movesDownTooMuch && !topIsVisible) {
 								moveYBy += newTopDistance + visualMargin;
 							}
@@ -299,7 +299,7 @@ export default class Zoomy {
 						if (newBottom < currentBottom) {
 							var newBottomDistance = box.bottom - newBottom,
 								movesUpTooMuch = newBottomDistance > visualMargin,
-								bottomIsVisible = currentBottom <= (box.bottom - visualMargin);
+								bottomIsVisible = currentBottom < (box.bottom - visualMargin - 1);
 							if (movesUpTooMuch && !bottomIsVisible) {
 								moveYBy += newBottomDistance - visualMargin;
 							}
@@ -310,7 +310,6 @@ export default class Zoomy {
 				var diffX = imgCenterX - boxCenterX,
 					diffY = imgCenterY - boxCenterY,
 					scaleDiff = 1 - currentScale;
-					// console.log(imgCenterX, imgCenterY)
 
 					//ratio of distance to scaling
 					adjustedDiffX = diffX / scaleDiff,
@@ -319,62 +318,65 @@ export default class Zoomy {
 					moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
 			}
 
-			if (!this.boxEl) {
-				if (!isShrinking) {
-					var imageInLeftSide = imgCenterX < boxCenterX;
-					var imageInRightSide = imgCenterX > boxCenterX;
-					var imageInTopPart = imgCenterY < boxCenterY;
-					var imageInBottomPart = imgCenterY > boxCenterY;
-					var parentWidth = this.el.parentElement.offsetWidth;
-
-					var fixedCornerToImageCenterX;
-					var fixedCornerToImageCenterY;
-
-					if (fitsEntirely) {
-						if (imageInRightSide && imageInTopPart) {
-							fixedCornerToImageCenterX = img.width / 2,
-							fixedCornerToImageCenterY = -img.height / 2;
-						}
-
-						if(imageInRightSide && imageInBottomPart) {
-							fixedCornerToImageCenterX = img.width / 2,
-							fixedCornerToImageCenterY = img.height / 2;
-						}
-
-						if (imageInLeftSide && imageInTopPart) {
-							fixedCornerToImageCenterX = -img.width / 2,
-							fixedCornerToImageCenterY = -img.height / 2;
-						}
-
-						if (imageInLeftSide && imageInBottomPart) {
-							fixedCornerToImageCenterX = -img.width / 2,
-							fixedCornerToImageCenterY = img.height / 2;
-						}
-
-						adjustedDiffX = fixedCornerToImageCenterX / currentScale,
-						adjustedDiffY = fixedCornerToImageCenterY / currentScale;
-
-						if (newWidth < parentWidth) {
-							moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
-							moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
-						}
-					}
-				} else {
-					if (sideFits) {
-						var originalImageX = this.el.offsetLeft + this.el.offsetWidth / 2;
-						var originalImageY = this.el.offsetTop + this.el.offsetHeight / 2;
-						diffX = imgCenterX - originalImageX + window.scrollX,
-						diffY = imgCenterY - originalImageY + window.scrollY,
-						scaleDiff = 1 - currentScale;
-
-						//ratio of distance to scaling
-						adjustedDiffX = diffX / scaleDiff,
-						adjustedDiffY = diffY / scaleDiff,
-						moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
-						moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
-					}
-				}
-			}
+			// if (!this.boxEl) {
+			// 	if (!isShrinking) {
+			// 		imgCenterX = (this.el.offsetLeft + this.el.offsetWidth / 2) - window.scrollX;
+			// 		imgCenterY = (this.el.offsetTop + this.el.offsetHeight / 2) - window.scrollY;
+			//
+			// 		var imageInLeftSide = imgCenterX < boxCenterX;
+			// 		var imageInRightSide = imgCenterX > boxCenterX;
+			// 		var imageInTopPart = imgCenterY < boxCenterY;
+			// 		var imageInBottomPart = imgCenterY > boxCenterY;
+			// 		var parentWidth = this.el.parentElement.offsetWidth;
+			//
+			// 		var fixedCornerToImageCenterX;
+			// 		var fixedCornerToImageCenterY;
+			//
+			// 		if (fitsEntirely) {
+			// 			if (imageInRightSide && imageInTopPart) {
+			// 				fixedCornerToImageCenterX = img.width / 2,
+			// 				fixedCornerToImageCenterY = -img.height / 2;
+			// 			}
+			//
+			// 			if(imageInRightSide && imageInBottomPart) {
+			// 				fixedCornerToImageCenterX = img.width / 2,
+			// 				fixedCornerToImageCenterY = img.height / 2;
+			// 			}
+			//
+			// 			if (imageInLeftSide && imageInTopPart) {
+			// 				fixedCornerToImageCenterX = -img.width / 2,
+			// 				fixedCornerToImageCenterY = -img.height / 2;
+			// 			}
+			//
+			// 			if (imageInLeftSide && imageInBottomPart) {
+			// 				fixedCornerToImageCenterX = -img.width / 2,
+			// 				fixedCornerToImageCenterY = img.height / 2;
+			// 			}
+			//
+			// 			adjustedDiffX = fixedCornerToImageCenterX / currentScale,
+			// 			adjustedDiffY = fixedCornerToImageCenterY / currentScale;
+			//
+			// 			if (newWidth < parentWidth) {
+			// 				moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
+			// 				moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
+			// 			}
+			// 		}
+			// 	} else {
+			// 		if (sideFits) {
+			// 			var originalImageX = this.el.offsetLeft + this.el.offsetWidth / 2;
+			// 			var originalImageY = this.el.offsetTop + this.el.offsetHeight / 2;
+			// 			diffX = imgCenterX - originalImageX + window.scrollX,
+			// 			diffY = imgCenterY - originalImageY + window.scrollY,
+			// 			scaleDiff = 1 - currentScale;
+			//
+			// 			//ratio of distance to scaling
+			// 			adjustedDiffX = diffX / scaleDiff,
+			// 			adjustedDiffY = diffY / scaleDiff,
+			// 			moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
+			// 			moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
+			// 		}
+			// 	}
+			// }
 		}
 		this.transform(this.el, moveXBy, moveYBy, enlargeOrShrinkBy);
 		e.preventDefault();
