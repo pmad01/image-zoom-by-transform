@@ -46,7 +46,6 @@ export default class Zoomy {
 	 * @type {Object}
 	 */
 	options = {
-		boundaryElementId: null,
 		zoomUpperConstraint: null
 	};
 
@@ -54,7 +53,13 @@ export default class Zoomy {
 	 * The original z-index of the image before any change
 	 * @type {string}
 	 */
-	originalZIndex;
+	originalZIndexValue;
+
+	/**
+	 * The original transform property value of the image
+	 * @type {string}
+	 */
+	originalTransformValue;
 
 	/**
 	 * @param elementId
@@ -63,27 +68,25 @@ export default class Zoomy {
 	constructor(elementId, options) {
 		this.el = document.getElementById(elementId);
 		this.options = {...options };
-		this.boxEl = this.options.boundaryElementId ? document.getElementById(this.options.boundaryElementId) : null;
+		this.boxEl = this.el.parentElement;
+		this.boxEl.style.overflow = 'hidden';
 		this.options.zoomUpperConstraint ||= 4;
 		var fn = this.handleMouseEvents.bind(this);
+		this.originalZIndexValue = window.getComputedStyle(this.el).zIndex;
+		this.originalTransformValue = window.getComputedStyle(this.el).transform;
 
-		if (this.boxEl) {
-			this.boxEl.addEventListener('wheel', fn, {passive: false});
-		} else {
-			this.originalZIndex = window.getComputedStyle(this.el).zIndex;
-
-			this.el.addEventListener('wheel', (e) => {
-				this.el.style.zIndex = '999999';
-				fn(e);
-			} , {passive: false});
-		}
+		this.boxEl.addEventListener('wheel', (e) => {
+			this.el.style.zIndex = '999999';
+			fn(e);
+		}, {passive: false});
 
 		this.el.addEventListener('mousedown', fn, {passive: false});
 
 		this.el.addEventListener('mouseout',  () => {
 			if (!this.isDragging) {
 				this.el.style.transform = 'matrix(1, 0, 0, 1, 0, 0)';
-				this.el.style.zIndex = this.originalZIndex;
+				this.el.style.transform = this.originalTransformValue;
+				this.el.style.zIndex = this.originalZIndexValue;
 			}
 		});
 
@@ -104,22 +107,8 @@ export default class Zoomy {
 			moveXBy = 0,
 			moveYBy = 0,
 			img = this.el.getBoundingClientRect(),
-			box;
-
-		if (this.boxEl) {
-			box = this.boxEl.getBoundingClientRect();
-		} else {
-			box = {
-				width: window.innerWidth,
-				height: window.innerHeight,
-				left: window.screenLeft,
-				top: window.screenTop,
-				right: window.innerWidth,
-				bottom: window.innerHeight
-			}
-		}
-
-		var widthFits = img.width < box.width,
+			box = this.boxEl.getBoundingClientRect(),
+			widthFits = img.width < box.width,
 			heightFits = img.height < box.height,
 			currentLeft = img.left,
 			currentRight = img.right,
@@ -200,15 +189,16 @@ export default class Zoomy {
 				boxCenterY = box.top + (box.height / 2),
 				newImageCenterXDiff = currentMouseX - imgCenterX,
 				newImageCenterYDiff = currentMouseY - imgCenterY,
-				zoomInImage = this.el.contains(e.target),
+				zoomInImage = this.boxEl.contains(e.target),
 				isShrinking = e.deltaY > 0,
 				enlargeOrShrinkBy = 0,
 				zoomFactor = .1,
-				currentScale = img.width / this.el.offsetWidth,
+				currentScale = Math.round((img.width / this.el.offsetWidth) * 10) / 10,
 				fitsEntirely = widthFits && heightFits,
 				sideFits = widthFits || heightFits;
 
-			enlargeOrShrinkBy = (e.deltaY > 0 ? -zoomFactor : zoomFactor) * currentScale;
+			enlargeOrShrinkBy = Math.round(((e.deltaY > 0 ? -zoomFactor : zoomFactor) * currentScale) * 10) / 10;
+			// console.log(enlargeOrShrinkBy)
 
 			var newScale = currentScale + enlargeOrShrinkBy,
 				newWidth = this.el.offsetWidth * newScale,
@@ -217,167 +207,115 @@ export default class Zoomy {
 			if (newScale > this.options.zoomUpperConstraint) {
 				enlargeOrShrinkBy = 0;
 			}
-			else if (newScale < 1) {
-				enlargeOrShrinkBy = 1-currentScale; //lower limit
+			else if (currentScale < 1.2 && isShrinking) {
+					enlargeOrShrinkBy = 0;
+					this.el.style.transform = 'matrix(1, 0, 0, 1, 0, 0)';
+					this.el.style.transform = this.originalTransformValue;
 			}
-
-			if (zoomInImage) {
-				if (!fitsEntirely) {
-					//ratio of distance to scaling
-					var adjustedDiffX = newImageCenterXDiff / currentScale,
-						adjustedDiffY = newImageCenterYDiff / currentScale;
-
-						moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
-						moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
-				}
-				if (isShrinking) {
-					if (sideFits) {
-						diffX = imgCenterX - boxCenterX,
-						diffY = imgCenterY - boxCenterY,
-						scaleDiff = 1 - currentScale;
-						// console.log(imgCenterX, imgCenterY)
-
+			else {
+				if (zoomInImage) {
+					if (!fitsEntirely) {
 						//ratio of distance to scaling
-						adjustedDiffX = diffX / scaleDiff,
-						adjustedDiffY = diffY / scaleDiff,
+						var adjustedDiffX = newImageCenterXDiff / currentScale,
+							adjustedDiffY = newImageCenterYDiff / currentScale;
+
 						moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
 						moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
 					}
-					var widthShrankBy = newWidth - img.width,
-						oneSideWidthShrankBy = widthShrankBy / 2,
-						heightShrankBy = newHeight - img.height,
-						oneSideHeightShrankBy = heightShrankBy / 2,
-						horizontalMove = moveXBy - oneSideWidthShrankBy,
-						verticalMove = moveYBy - oneSideHeightShrankBy,
-						visualMargin = 0;
+					if (isShrinking) {
+						if (sideFits) {
+							diffX = imgCenterX - boxCenterX,
+							diffY = imgCenterY - boxCenterY,
+							scaleDiff = 1 - currentScale;
+							// console.log(imgCenterX, imgCenterY)
+
+							//ratio of distance to scaling
+							adjustedDiffX = diffX / scaleDiff,
+							adjustedDiffY = diffY / scaleDiff,
+							moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
+							moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
+						}
+						var widthShrankBy = newWidth - img.width,
+							oneSideWidthShrankBy = widthShrankBy / 2,
+							heightShrankBy = newHeight - img.height,
+							oneSideHeightShrankBy = heightShrankBy / 2,
+							horizontalMove = moveXBy - oneSideWidthShrankBy,
+							verticalMove = moveYBy - oneSideHeightShrankBy,
+							boxPadding = 0;
 
 						newLeft = currentLeft + horizontalMove;
 						newRight = newLeft + newWidth;
 						newTop = currentTop + verticalMove;
 						newBottom = newTop + newHeight;
 
-					if (!widthFits) {
-						if (newLeft > currentLeft) {
-							var newLeftDistance = box.left - newLeft,
-								movesRightTooMuch = newLeftDistance < -visualMargin,
-								leftSideIsVisible = currentLeft > (box.left + visualMargin + 1);
+						if (!widthFits) {
+							if (newLeft > currentLeft) {
+								var newLeftDistance = box.left - newLeft,
+									movesRightTooMuch = newLeftDistance < -boxPadding,
+									paddedBoxLeft = box.left + boxPadding,
+									leftSideIsVisible = currentLeft > paddedBoxLeft + 1;
 
-							if (movesRightTooMuch && !leftSideIsVisible) {
-								moveXBy += newLeftDistance + visualMargin;
+								if (movesRightTooMuch && !leftSideIsVisible) {
+									moveXBy += newLeftDistance + boxPadding;
+								}
+								// console.log({
+								// 	newLeftDistance,
+								// 	currentLeft,
+								// 	boxLeft: box.left,
+								// 	visualMargin: boxPadding,
+								// 	movesRightTooMuch,
+								// 	leftSideIsVisible,
+								// 	moveXBy
+								// });
 							}
-							// console.log({
-							// 	newLeftDistance,
-							// 	currentLeft,
-							// 	boxLeft: box.left,
-							// 	visualMargin,
-							// 	movesRightTooMuch,
-							// 	leftSideIsVisible,
-							// 	moveXBy
-							// })
+
+							if (newRight < currentRight) {
+								var newRightDistance = box.right - newRight,
+									movesLeftTooMuch = newRightDistance > boxPadding,
+									paddedBoxRight = box.right - boxPadding,
+									rightSideIsVisible = currentRight < paddedBoxRight - 1;
+								if (movesLeftTooMuch && !rightSideIsVisible) {
+									moveXBy += newRightDistance - boxPadding;
+								}
+							}
 						}
 
-						if (newRight < currentRight) {
-							var newRightDistance = box.right - newRight,
-								movesLeftTooMuch = newRightDistance > visualMargin,
-								rightSideIsVisible = currentRight < (box.right - visualMargin - 6);
-							if (movesLeftTooMuch && !rightSideIsVisible) {
-								moveXBy += newRightDistance - visualMargin;
+						if (!heightFits) {
+							if (newTop > currentTop) {
+								var newTopDistance = box.top - newTop,
+									movesDownTooMuch = newTopDistance < -boxPadding,
+									paddedBoxTop = box.top + boxPadding,
+									topIsVisible = currentTop > paddedBoxTop + 1;
+								if (movesDownTooMuch && !topIsVisible) {
+									moveYBy += newTopDistance + boxPadding;
+								}
+							}
+
+							if (newBottom < currentBottom) {
+								var newBottomDistance = box.bottom - newBottom,
+									movesUpTooMuch = newBottomDistance > boxPadding,
+									paddedBoxBottom = box.bottom - boxPadding,
+									bottomIsVisible = currentBottom < paddedBoxBottom - 1;
+								if (movesUpTooMuch && !bottomIsVisible) {
+									moveYBy += newBottomDistance - boxPadding;
+								}
 							}
 						}
 					}
-
-					if (!heightFits) {
-						if (newTop > currentTop) {
-							var newTopDistance = box.top - newTop,
-								movesDownTooMuch = newTopDistance < -visualMargin,
-								topIsVisible = currentTop > (box.top + visualMargin + 1);
-							if (movesDownTooMuch && !topIsVisible) {
-								moveYBy += newTopDistance + visualMargin;
-							}
-						}
-
-						if (newBottom < currentBottom) {
-							var newBottomDistance = box.bottom - newBottom,
-								movesUpTooMuch = newBottomDistance > visualMargin,
-								bottomIsVisible = currentBottom < (box.bottom - visualMargin - 1);
-							if (movesUpTooMuch && !bottomIsVisible) {
-								moveYBy += newBottomDistance - visualMargin;
-							}
-						}
-					}
-				}
-			} else {
-				var diffX = imgCenterX - boxCenterX,
-					diffY = imgCenterY - boxCenterY,
-					scaleDiff = 1 - currentScale;
+				} else {
+					var diffX = imgCenterX - boxCenterX,
+						diffY = imgCenterY - boxCenterY,
+						scaleDiff = 1 - currentScale;
 
 					//ratio of distance to scaling
 					adjustedDiffX = diffX / scaleDiff,
 					adjustedDiffY = diffY / scaleDiff,
 					moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
 					moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
+				}
 			}
-
-			// if (!this.boxEl) {
-			// 	if (!isShrinking) {
-			// 		imgCenterX = (this.el.offsetLeft + this.el.offsetWidth / 2) - window.scrollX;
-			// 		imgCenterY = (this.el.offsetTop + this.el.offsetHeight / 2) - window.scrollY;
-			//
-			// 		var imageInLeftSide = imgCenterX < boxCenterX;
-			// 		var imageInRightSide = imgCenterX > boxCenterX;
-			// 		var imageInTopPart = imgCenterY < boxCenterY;
-			// 		var imageInBottomPart = imgCenterY > boxCenterY;
-			// 		var parentWidth = this.el.parentElement.offsetWidth;
-			//
-			// 		var fixedCornerToImageCenterX;
-			// 		var fixedCornerToImageCenterY;
-			//
-			// 		if (fitsEntirely) {
-			// 			if (imageInRightSide && imageInTopPart) {
-			// 				fixedCornerToImageCenterX = img.width / 2,
-			// 				fixedCornerToImageCenterY = -img.height / 2;
-			// 			}
-			//
-			// 			if(imageInRightSide && imageInBottomPart) {
-			// 				fixedCornerToImageCenterX = img.width / 2,
-			// 				fixedCornerToImageCenterY = img.height / 2;
-			// 			}
-			//
-			// 			if (imageInLeftSide && imageInTopPart) {
-			// 				fixedCornerToImageCenterX = -img.width / 2,
-			// 				fixedCornerToImageCenterY = -img.height / 2;
-			// 			}
-			//
-			// 			if (imageInLeftSide && imageInBottomPart) {
-			// 				fixedCornerToImageCenterX = -img.width / 2,
-			// 				fixedCornerToImageCenterY = img.height / 2;
-			// 			}
-			//
-			// 			adjustedDiffX = fixedCornerToImageCenterX / currentScale,
-			// 			adjustedDiffY = fixedCornerToImageCenterY / currentScale;
-			//
-			// 			if (newWidth < parentWidth) {
-			// 				moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
-			// 				moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
-			// 			}
-			// 		}
-			// 	} else {
-			// 		if (sideFits) {
-			// 			var originalImageX = this.el.offsetLeft + this.el.offsetWidth / 2;
-			// 			var originalImageY = this.el.offsetTop + this.el.offsetHeight / 2;
-			// 			diffX = imgCenterX - originalImageX + window.scrollX,
-			// 			diffY = imgCenterY - originalImageY + window.scrollY,
-			// 			scaleDiff = 1 - currentScale;
-			//
-			// 			//ratio of distance to scaling
-			// 			adjustedDiffX = diffX / scaleDiff,
-			// 			adjustedDiffY = diffY / scaleDiff,
-			// 			moveXBy = -adjustedDiffX * enlargeOrShrinkBy,
-			// 			moveYBy = -adjustedDiffY * enlargeOrShrinkBy;
-			// 		}
-			// 	}
-			// }
 		}
+
 		this.transform(this.el, moveXBy, moveYBy, enlargeOrShrinkBy);
 		e.preventDefault();
 

@@ -9,63 +9,56 @@
      -moz-user-select: none;
       text-align:center;
     }
-    .zoomables {
-      width: 100%;
-      height: 100%;
-      position: relative;
-    }
-    div {
+    .container {
       display: inline-block;
       width: 700px;
       vertical-align: top;
       text-align: justify;
     }
-    p {
+    .something div.box {
+        margin: 10px;
+    }
+    .text {
       text-align: justify;
     }
-    .zoomableDiv {
-      display: flex;
-      width: 50%;
-      overflow: hidden;
-      align-items: center;
-      justify-content: center;
-      margin: 0 10px;
+    .box {
+        margin: 0 10px;
     }
   </style>
 </head>
 <body>
 
 <h1>Life with Sports</h1>
-<div>
+<div class="container">
     <h2>Liverpool</h2>
-    <div id="zoomyDiv1" class="zoomableDiv" style="float: right;">
-        <img id="zoomy1" class="zoomables" src="https://i2-prod.liverpoolecho.co.uk/incoming/article27424491.ece/ALTERNATES/s1200c/0_GettyImages-1580638036.jpg" alt=""/>
+    <div class="box" style="float: right; width:340px; height:340px;">
+        <img id="zoomy1" width="340" src="https://i2-prod.liverpoolecho.co.uk/incoming/article27424491.ece/ALTERNATES/s1200c/0_GettyImages-1580638036.jpg" alt=""/>
     </div>
-    <p>
+    <p class="text">
         Chaos in the first half, chaos in the second half. Chaos in the Liverpool defence and chaos in the Newcastle defence. Chaos in Trent Alexander-Arnold’s mind, in Virgil van Dijk’s mind, perhaps in the referee’s mind. Chaos so thoroughly chaotic that it rendered the most chaotic Premier League player of all into a clanking totem of clinically icy finishing. Football is a sport we try to rationalise. We try to explain it with data and diagrams. We try to reduce the random by having referees’ decisions checked in slow motion and by endlessly rewriting the laws. But sometimes the random just bubbles over. Sometimes the chaos cannot be contained. And that is what, despite the dirty money and the dirtier money, despite the public investment funds and the private equity, despite the conspiracy theorists and tribal bores, makes football still worth it
         In 1928, the great editor of El Gráfico, Borocotó, proposed raising a statue to the spirit of Argentinian dribbling and ended up prophesying Diego Maradona, 32 years before he was born. Raise a statue to the spirit of the modern Premier League as it is and you would end up with sacks of cash, barrels of oil, social media fury, a cattle prod and a bonesaw. Raise a statue to what it should be and it might look something like Darwin Núñez.
         No one knows if he is any good. No one knows at any moment, whether he is about to lash a shot into the top corner or trip over. No one knows if he was £85m well spent or a waste who exemplifies Liverpool’s lack of direction after a series of resignations from their once-vaunted transfer committee. And that’s the beauty of it. Football keeps on reminding us that it is a game best enjoyed when no one has a clue about anything.
     </p>
 </div>
 <br>
-<div>
+<div class="container">
     <h2>Wallabies</h2>
-    <div id="zoomyDiv2" class="zoomableDiv" style="float: left">
-        <img id="zoomy2" class="zoomables" src="https://i.guim.co.uk/img/media/c67942c4832d6a50f1f90bb61da89aa62772154c/0_20_3000_1800/master/3000.jpg?width=620&dpr=2&s=none" alt=""/>
+    <div class="box" style="float: left; width: 350px">
+        <img id="zoomy2" width="350" src="https://i.guim.co.uk/img/media/c67942c4832d6a50f1f90bb61da89aa62772154c/0_20_3000_1800/master/3000.jpg?width=620&dpr=2&s=none" alt=""/>
     </div>
-    <p>
+    <p class="text">
         They lost again. They improved again. They fired some shots but often into their own feet. They dominated possession but didn’t convert it to points. They created lots of chances but squandered plenty of opportunities. They were mostly brave and occasionally stupid. Again. Australia’s 41-17 loss to France piles more pressure on a side already labouring under a 0-5 start to the season. But the coach maintains this latest pummelling doesn’t mean much in the grander scheme of the Wallabies’ World Cup campaign starting on 10 September. Defeat, Eddie Jones says, isn’t another nail in the coffin, it’s another rung up the ladder.
         “The scoreboard is always important, but we’ve got a greater aim than this game,” Jones said after the defeat. “In terms of what we want to do for the World Cup, we probably did a lot of good things. But we’ve got to get better at converting territory to points and when they get in our territory, stopping them scoring points. We’re not a bad team but we’re not a good team yet.”
         Score points, stop points. It sounds so easy. But a young Australian squad featuring 12 players with 10 caps or fewer, failed by both measures against the World Cup hosts at Stade de France. Against France, one of the tournament favourites, that was perhaps expected. Despite the last six Tests between these nations being decided by three points or fewer, most recently a 30-29 thriller in November, noble defeat is becoming a habit for this team.
     </p>
 </div>
 <br>
-<div>
+<div class="container">
     <h2>Women World Cup</h2>
-    <div id="zoomyDiv3" class="zoomableDiv" style="float: right">
-        <img id="zoomy3" class="zoomables" src="https://upload.wikimedia.org/wikipedia/en/thumb/2/24/Logo_of_the_2023_FIFA_Women%27s_World_Cup.svg/1200px-Logo_of_the_2023_FIFA_Women%27s_World_Cup.svg.png" alt=""/>
+    <div class="box" style="float: right; width: 305px">
+        <img id="zoomy3" width="305" src="https://upload.wikimedia.org/wikipedia/en/thumb/2/24/Logo_of_the_2023_FIFA_Women%27s_World_Cup.svg/1200px-Logo_of_the_2023_FIFA_Women%27s_World_Cup.svg.png" alt=""/>
     </div>
-    <p>
+    <p class="text">
         Happy birthday!” “Thanks!” Suddenly all I can see is the ceiling, and flashes of blurred movement. Is that wrapping paper? “Thanks mum!” “You’re welcome!” I have no idea what my 10-year-old son is thanking me for. Tournament football can be tough. Is it worth it? Is seven weeks away from your kid really worth it? How many birthdays can I miss?
         No matter the joy, the adrenaline, the rush, the guilt over feeling guilty when you’re doing a job you love and that others would give up a limb for, those questions still hit you. Regularly. In many ways, doing the job I do allows me to spend time with my kid in ways that those working nine to five can’t. I’m here, I’m there, from matches to training grounds, but I’m able to help do the school runs, to be present day-to-day, but the tournaments take an emotional and physical toll. It is long days, late nights, thousands of words, mistimed video calls home, unhealthy eating, lots of travel, late-night podcast records, tempered only by the football, the players and the camaraderie between journalists.
         At heart, it’s the stories that keep you going, the stories of the teams and players who have spent their lives dreaming of pulling on the shirt and stepping out on to the grass in a World Cup, who have sacrificed everything for the chance of having that moment.
@@ -74,26 +67,26 @@
     </p>
 </div>
 <br>
-<div>
+<div class="container">
     <h2>AFL</h2>
-    <div id="zoomyDiv4" class="zoomableDiv" style="float: left">
-        <img id="zoomy4" class="zoomables" src="https://www.bluemountainsgazette.com.au/images/transform/v1/crop/frm/silverstone-feed-data/abb70df7-b6fd-47a1-90a5-74f82c9d0649.jpg/r0_0_800_600_w800_h600_fmax.jpg" alt="">
+    <div class="box" style="float: left; width: 400px">
+        <img id="zoomy4" width="400" src="https://www.bluemountainsgazette.com.au/images/transform/v1/crop/frm/silverstone-feed-data/abb70df7-b6fd-47a1-90a5-74f82c9d0649.jpg/r0_0_800_600_w800_h600_fmax.jpg" alt="">
     </div>
-    <p>
-    As the AFL was reminded again last weekend, to its significant chagrin, there is no such thing as a certainty in sport after a round that damaged reputations and decimated finals hopes. Not only did a goal review farce sink Adelaide and further dent the battered commodity known as the integrity of the competition, a string of shock results in the penultimate round has largely robbed the AFL of a fairytale lead-in to the finals series.
-    The suspense is not completely killed off as flag contenders jostle for position but the final round of the season is not the blockbuster envisaged earlier this month. Both the competition and broadcasters will be hoping the Western Bulldogs can rediscover their bark and bite against Geelong on Saturday to set the scene for a Sunday night special. A Bulldogs triumph would see them draw level on points with the eighth-placed Giants, which would then need to defeat Carlton at Marvel Stadium on Sunday night to qualify.
-    This is not the finale the AFL hoped for when bidding to design a “crescendo into what is sure to be a hotly contested” finals series by delaying the scheduling of its round 24 fixture until just over a fortnight ago. Even in the midst of a Women’s World Cup success beyond Fifa and Australia’s wildest dreams, the AFL snared headlines with more than a dozen sides in contention for a spot in the eight.
-    It might seem humdrum to some, but the release of the AFL fixture each year has become a key event in its own right to be promoted, one sold with panache to the football masses. The strategic leaks, a skillset honed to perfection throughout each off-season to ensure the AFL retains prominent real estate, worked wonders given the media traction.
+    <p class="text">
+        As the AFL was reminded again last weekend, to its significant chagrin, there is no such thing as a certainty in sport after a round that damaged reputations and decimated finals hopes. Not only did a goal review farce sink Adelaide and further dent the battered commodity known as the integrity of the competition, a string of shock results in the penultimate round has largely robbed the AFL of a fairytale lead-in to the finals series.
+        The suspense is not completely killed off as flag contenders jostle for position but the final round of the season is not the blockbuster envisaged earlier this month. Both the competition and broadcasters will be hoping the Western Bulldogs can rediscover their bark and bite against Geelong on Saturday to set the scene for a Sunday night special. A Bulldogs triumph would see them draw level on points with the eighth-placed Giants, which would then need to defeat Carlton at Marvel Stadium on Sunday night to qualify.
+        This is not the finale the AFL hoped for when bidding to design a “crescendo into what is sure to be a hotly contested” finals series by delaying the scheduling of its round 24 fixture until just over a fortnight ago. Even in the midst of a Women’s World Cup success beyond Fifa and Australia’s wildest dreams, the AFL snared headlines with more than a dozen sides in contention for a spot in the eight.
+        It might seem humdrum to some, but the release of the AFL fixture each year has become a key event in its own right to be promoted, one sold with panache to the football masses. The strategic leaks, a skillset honed to perfection throughout each off-season to ensure the AFL retains prominent real estate, worked wonders given the media traction.
     </p>
 </div>
 
 <script type="module">
 	import Zoomy from "./Zoomy.js";
 
-	const zoomy1 = new Zoomy('zoomy1', {zoomUpperConstraint: 10, boundaryElementId: 'zoomyDiv1'});
-	const zoomy2 = new Zoomy('zoomy2', {boundaryElementId: 'zoomyDiv2'});
-	const zoomy3 = new Zoomy('zoomy3', {zoomUpperConstraint: 3, boundaryElementId: 'zoomyDiv3'});
-	const zoomy4 = new Zoomy('zoomy4', {boundaryElementId: 'zoomyDiv4'});
+	const zoomy1 = new Zoomy('zoomy1', {zoomUpperConstraint: 10});
+	const zoomy2 = new Zoomy('zoomy2');
+	const zoomy3 = new Zoomy('zoomy3', {zoomUpperConstraint: 3});
+	const zoomy4 = new Zoomy('zoomy4');
 
 
 
@@ -101,10 +94,9 @@
     // const zoomables = document.getElementsByClassName("zoomables");
 	// [...zoomables].forEach(zoomable => {
 	// 	zoomable.addEventListener("mouseover", function () {
-	// 		const zoomyId = zoomable.id;
-	// 		const zoomy = new Zoomy(`${zoomyId}`, {zoomUpperConstraint: 9});
+	// 		const zoomy = new Zoomy({zoomUpperConstraint: 9});
 	// 	});
-    // })
+    // });
 
 </script>
 </body>
