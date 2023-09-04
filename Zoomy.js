@@ -75,14 +75,18 @@ export default class Zoomy {
 		this.originalZIndexValue = window.getComputedStyle(this.el).zIndex;
 		this.originalTransformValue = window.getComputedStyle(this.el).transform;
 
+		['mousemove', 'mouseup'].forEach(
+			event => {
+				document.addEventListener(event, fn, {passive: false});
+			}
+		);
+
 		this.boxEl.addEventListener('wheel', (e) => {
 			this.el.style.zIndex = '999999';
 			fn(e);
 		}, {passive: false});
 
-		this.el.addEventListener('mousedown', fn, {passive: false});
-
-		this.el.addEventListener('mouseout',  () => {
+		this.boxEl.addEventListener('mouseleave',  () => {
 			if (!this.isDragging) {
 				this.el.style.transform = 'matrix(1, 0, 0, 1, 0, 0)';
 				this.el.style.transform = this.originalTransformValue;
@@ -90,11 +94,8 @@ export default class Zoomy {
 			}
 		});
 
-		['mousemove', 'mouseup', 'mouseout'].forEach(
-			event => {
-				document.addEventListener(event, fn, {passive: false});
-			}
-		);
+		this.el.addEventListener('mousedown', fn, {passive: false});
+
 	}
 
 	/**
@@ -102,6 +103,7 @@ export default class Zoomy {
 	 * @param {Event} e
 	 */
 	transformByMouseEvent(e) {
+		console.log(e.type)
 		var currentMouseX = e.x,
 			currentMouseY = e.y,
 			moveXBy = 0,
@@ -122,7 +124,7 @@ export default class Zoomy {
 		if (e.type === 'mouseup') {
 			this.mouseIsDown = false;
 		}
-		if (this.mouseIsDown && e.type === 'mousemove') {
+		if (this.mouseIsDown && (e.type === 'mousemove' || e.type === 'mouseleave')) {
 			this.isDragging = true;
 		}
 
@@ -365,18 +367,13 @@ export default class Zoomy {
 	 * This method removes the event listeners from the instance element of the class.
 	 */
 	detach(){
-		if (this.boxEl) {
-			this.boxEl.removeEventListener('wheel', this.handleMouseEvents);
-		} else {
-			this.el.removeEventListener('wheel', this.handleMouseEvents);
-			this.el.removeEventListener('mouseout', this.handleMouseEvents);
-		}
-		this.el.removeEventListener('mousedown', this.handleMouseEvents);
-		this.el.removeEventListener('mouseover', this.handleMouseEvents);
-
-		['mousemove', 'mouseup', 'mouseout'].forEach(
+		['mousemove', 'mouseup'].forEach(
 			event => document.removeEventListener(event, this.handleMouseEvents)
 		);
+		['wheel', 'mouseleave'].forEach(
+			event => this.boxEl.removeEventListener(event, this.handleMouseEvents)
+		);
+		this.el.removeEventListener('mousedown', this.handleMouseEvents);
 	}
 
 	/**
