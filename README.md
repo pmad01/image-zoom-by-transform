@@ -54,8 +54,6 @@ Follow these steps to integrate Zoomy into your project:
 
 const options = {
 
-    boundaryElementId: 'boundary-container', // ID of the boundary element (optional)
-
     zoomUpperConstraint: 4, // Upper limit for zooming (optional)
 
 };
@@ -69,8 +67,6 @@ const zoomyInstance = new Zoomy('zoomy-container', options);
 ## Configuration Options
 
 Zoomy provides configuration options to customize its behavior:
-
-- `boundaryElementId`: Specifies the ID of the boundary element to constrain the zoom and pan area. If not provided, the entire body is used as the boundary.
 
 - `zoomUpperConstraint`: Sets the upper limit for zooming. Images will not be scaled beyond this value.
 
